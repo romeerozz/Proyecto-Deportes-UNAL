@@ -57,7 +57,7 @@ Proyecto-Deportes-UNAL/
 │           │  │  └─ AvlIndex.java
 │           │  ├─ graph/
 │           │  │  ├─ AdjacencyMatrixGraph.java
-│           │  ├─  └─ Queue.java 
+│           │  │  └─ Queue.java 
 │           ├─ services/
 │           │  ├─ StudentService.java
 │           │  ├─ CommunityService.java
@@ -72,7 +72,8 @@ Proyecto-Deportes-UNAL/
 │           └─ export/
 │              └─ GraphExporter.java
 ├─ data/
-│  └─ students.txt
+│  ├─ students.txt
+│  └─ sports.txt
 └─ docs/
    ├─ Entrega1.pdf
    └─ diagramas/
