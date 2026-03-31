@@ -43,7 +43,25 @@ public class Student {
         this.interest = interest;
     }
 
-    public void addPractice(SportsEnum s){
-        if(practice)
+    public boolean addPractice(SportsEnum s){
+        if(practice.contains(s)) return false;
+        practice.pushBack(s);
+        return true;
+    }
+
+    public boolean removePractice(SportsEnum s){
+        //return practice.erase(s);
+        return true;
+    }
+
+    public boolean addInterest(SportsEnum s){
+        if(interest.contains(s)) return false;
+        interest.pushBack(s);
+        return true;
+    }
+
+    public boolean removeInterest(SportsEnum s){
+        //return interest.erase(s)
+        return true;
     }
 }
