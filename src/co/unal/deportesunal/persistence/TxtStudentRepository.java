@@ -1,4 +1,4 @@
 package co.unal.deportesunal.persistence;
 
-public interface StudentRepository {
+public class TxtStudentRepository {
 }
