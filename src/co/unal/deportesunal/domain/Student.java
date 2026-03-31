@@ -42,4 +42,8 @@ public class Student {
     public void setInterest(LinkedList<SportsEnum> interest) {
         this.interest = interest;
     }
+
+    public void addPractice(SportsEnum s){
+        if(practice)
+    }
 }
