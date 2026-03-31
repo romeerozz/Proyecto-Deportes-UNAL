@@ -1,4 +1,4 @@
 package co.unal.deportesunal.structure.graphadt;
 
-public class AdjacenceMatrixGraph {
+public class AdjacenceMatrixGraph<T> implements Graph<T> {
 }
