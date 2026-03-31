@@ -13,4 +13,5 @@ public interface listAdt<T> {
     void erase(Position<T> position);
     void addBefore(Position<T> position, T value);
     void addAfter(Position<T> position, T value);
+    boolean contains(T value);
 }

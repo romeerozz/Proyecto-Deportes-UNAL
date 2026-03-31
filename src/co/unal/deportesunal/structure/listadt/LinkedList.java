@@ -60,4 +60,9 @@ public class LinkedList<T> implements listAdt<T>{
     public void addAfter(Position<T> position, T value) {
 
     }
+
+    @Override
+    public boolean contains(T value) {
+        return false;
+    }
 }
