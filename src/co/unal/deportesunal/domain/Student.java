@@ -43,23 +43,25 @@ public class Student {
         this.interest = interest;
     }
 
-    public void addPractice(SportsEnum s){
-        if (s == null) {
-            return;
-        }
-
-        if (!practice.contains(s)) {
-            practice.pushBack(s);
-        }
+    public boolean addPractice(SportsEnum s){
+        if(practice.contains(s)) return false;
+        practice.pushBack(s);
+        return true;
     }
 
-    public void addInterest(SportsEnum s) {
-        if (s == null) {
-            return;
-        }
+    public boolean removePractice(SportsEnum s){
+        //return practice.erase(s);
+        return true;
+    }
 
-        if (!interest.contains(s)) {
-            interest.pushBack(s);
-        }
+    public boolean addInterest(SportsEnum s){
+        if(interest.contains(s)) return false;
+        interest.pushBack(s);
+        return true;
+    }
+
+    public boolean removeInterest(SportsEnum s){
+        //return interest.erase(s)
+        return true;
     }
 }
