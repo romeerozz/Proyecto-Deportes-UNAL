@@ -1,4 +1,5 @@
 package co.unal.deportesunal.structure.listadt;
 
-public class Position {
+public interface Position<T> {
+    T getValue();
 }
