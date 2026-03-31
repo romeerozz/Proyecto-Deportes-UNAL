@@ -1,4 +1,4 @@
 package co.unal.deportesunal.ui;
 
-public class AppController {
+public class ConsoleUi {
 }
