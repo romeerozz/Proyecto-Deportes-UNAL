@@ -3,20 +3,26 @@ package co.unal.deportesunal.domain;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class Student {
-    private final int ID;
-    private  String name;
-    private LinkedList<SportEnum> practice;
-    private LinkedList<SportEnum> interest;
 
-    public Student(int id, String name){
-        this.ID = id;
+    private final int id;
+    private String name;
+
+    private final LinkedList<SportEnum> practice;
+    private final LinkedList<SportEnum> interest;
+
+    public Student(int id, String name) {
+        this.id = id;
         this.name = name;
         this.practice = new LinkedList<>();
         this.interest = new LinkedList<>();
     }
 
+    public int getId() {
+        return id;
+    }
+
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getName() {
@@ -27,6 +33,12 @@ public class Student {
         this.name = name;
     }
 
+    /**
+     * NOTA: Por ahora se exponen las listas para no bloquear el repositorio TXT.
+     * TODO: cuando exista una forma segura de iterar (get(i) o forEach/Iterator),
+     *       reemplazar estos getters por métodos tipo practiceSize()/practiceAt(i)
+     *       para no exponer las listas directamente.
+     */
     public LinkedList<SportEnum> getPractice() {
         return practice;
     }
@@ -35,25 +47,45 @@ public class Student {
         return interest;
     }
 
-    public boolean addPractice(SportEnum s){
-        if(practice.contains(s)) return false;
+    public boolean addPractice(SportEnum s) {
+        if (s == null) return false;
+        if (practice.contains(s)) return false;
         practice.pushBack(s);
         return true;
     }
 
-    public boolean removePractice(SportEnum s){
-        //return practice.erase(s);
-        return true;
+    public boolean removePractice(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        return false;
     }
 
-    public boolean addInterest(SportEnum s){
-        if(interest.contains(s)) return false;
+    public boolean addInterest(SportEnum s) {
+        if (s == null) return false;
+        if (interest.contains(s)) return false;
         interest.pushBack(s);
         return true;
     }
 
-    public boolean removeInterest(SportEnum s){
-        //return interest.erase(s)
-        return true;
+    public boolean removeInterest(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        // return interest.remove(s);
+        return false;
+    }
+
+    public boolean practices(SportEnum s) {
+        if (s == null) return false;
+        return practice.contains(s);
+    }
+
+    public boolean isInterestedIn(SportEnum s) {
+        if (s == null) return false;
+        return interest.contains(s);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name='" + name + "'}";
     }
 }
