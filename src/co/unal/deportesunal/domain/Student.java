@@ -5,14 +5,18 @@ import co.unal.deportesunal.structure.listadt.LinkedList;
 public class Student {
     private final int ID;
     private  String name;
-    private LinkedList<SportsEnum> practice;
-    private LinkedList<SportsEnum> interest;
+    private LinkedList<SportEnum> practice;
+    private LinkedList<SportEnum> interest;
 
     public Student(int id, String name){
         this.ID = id;
         this.name = name;
         this.practice = new LinkedList<>();
         this.interest = new LinkedList<>();
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getID() {
@@ -43,23 +47,32 @@ public class Student {
         this.interest = interest;
     }
 
-    public void addPractice(SportsEnum s){
-        if (s == null) {
-            return;
-        }
+    public boolean removePractice(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        return false;
+    }
+}
 
-        if (!practice.contains(s)) {
-            practice.pushBack(s);
-        }
+    public boolean removeInterest(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        // return interest.remove(s);
+        return false;
     }
 
-    public void addInterest(SportsEnum s) {
-        if (s == null) {
-            return;
-        }
+    public boolean practices(SportEnum s) {
+        if (s == null) return false;
+        return practice.contains(s);
+    }
 
-        if (!interest.contains(s)) {
-            interest.pushBack(s);
-        }
+    public boolean isInterestedIn(SportEnum s) {
+        if (s == null) return false;
+        return interest.contains(s);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name='" + name + "'}";
     }
 }
