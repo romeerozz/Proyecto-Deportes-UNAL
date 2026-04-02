@@ -5,8 +5,8 @@ import co.unal.deportesunal.structure.listadt.LinkedList;
 public class Student {
     private final int ID;
     private  String name;
-    private LinkedList<SportsEnum> practice;
-    private LinkedList<SportsEnum> interest;
+    private LinkedList<SportEnum> practice;
+    private LinkedList<SportEnum> interest;
 
     public Student(int id, String name){
         this.ID = id;
@@ -27,32 +27,32 @@ public class Student {
         this.name = name;
     }
 
-    public LinkedList<SportsEnum> getPractice() {
+    public LinkedList<SportEnum> getPractice() {
         return practice;
     }
 
-    public LinkedList<SportsEnum> getInterest() {
+    public LinkedList<SportEnum> getInterest() {
         return interest;
     }
 
-    public boolean addPractice(SportsEnum s){
+    public boolean addPractice(SportEnum s){
         if(practice.contains(s)) return false;
         practice.pushBack(s);
         return true;
     }
 
-    public boolean removePractice(SportsEnum s){
+    public boolean removePractice(SportEnum s){
         //return practice.erase(s);
         return true;
     }
 
-    public boolean addInterest(SportsEnum s){
+    public boolean addInterest(SportEnum s){
         if(interest.contains(s)) return false;
         interest.pushBack(s);
         return true;
     }
 
-    public boolean removeInterest(SportsEnum s){
+    public boolean removeInterest(SportEnum s){
         //return interest.erase(s)
         return true;
     }
