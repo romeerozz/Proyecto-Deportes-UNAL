@@ -44,6 +44,22 @@ public class Student {
     }
 
     public void addPractice(SportsEnum s){
-        if(practice)
+        if (s == null) {
+            return;
+        }
+
+        if (!practice.contains(s)) {
+            practice.pushBack(s);
+        }
+    }
+
+    public void addInterest(SportsEnum s) {
+        if (s == null) {
+            return;
+        }
+
+        if (!interest.contains(s)) {
+            interest.pushBack(s);
+        }
     }
 }
