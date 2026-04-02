@@ -1,5 +1,4 @@
 package co.unal.deportesunal.domain;
-
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class Student {
@@ -22,7 +21,7 @@ public class Student {
     }
 
     public int getID() {
-        return id;
+        return ID;
     }
 
     public String getName() {
@@ -33,25 +32,20 @@ public class Student {
         this.name = name;
     }
 
-    /**
-     * NOTA: Por ahora se exponen las listas para no bloquear el repositorio TXT.
-     * TODO: cuando exista una forma segura de iterar (get(i) o forEach/Iterator),
-     *       reemplazar estos getters por métodos tipo practiceSize()/practiceAt(i)
-     *       para no exponer las listas directamente.
-     */
     public LinkedList<SportEnum> getPractice() {
         return practice;
+    }
+
+    public void setPractice(LinkedList<SportEnum> practice) {
+        this.practice = practice;
     }
 
     public LinkedList<SportEnum> getInterest() {
         return interest;
     }
 
-    public boolean addPractice(SportEnum s) {
-        if (s == null) return false;
-        if (practice.contains(s)) return false;
-        practice.pushBack(s);
-        return true;
+    public void setInterest(LinkedList<SportEnum> interest) {
+        this.interest = interest;
     }
 
     public boolean removePractice(SportEnum s) {
@@ -59,14 +53,6 @@ public class Student {
         // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
         return false;
     }
-
-    public boolean addInterest(SportEnum s) {
-        if (s == null) return false;
-        if (interest.contains(s)) return false;
-        interest.pushBack(s);
-        return true;
-    }
-
     public boolean removeInterest(SportEnum s) {
         if (s == null) return false;
         // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
@@ -89,3 +75,5 @@ public class Student {
         return "Student{id=" + id + ", name='" + name + "'}";
     }
 }
+
+
