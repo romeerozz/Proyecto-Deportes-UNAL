@@ -2,14 +2,12 @@ package co.unal.deportesunal.domain;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class Student {
-
     private final int id;
-    private String name;
+    private  String name;
+    private LinkedList<SportEnum> practice;
+    private LinkedList<SportEnum> interest;
 
-    private final LinkedList<SportEnum> practice;
-    private final LinkedList<SportEnum> interest;
-
-    public Student(int id, String name) {
+    public Student(int id, String name){
         this.id = id;
         this.name = name;
         this.practice = new LinkedList<>();
@@ -20,9 +18,7 @@ public class Student {
         return id;
     }
 
-    public int getID() {
-        return ID;
-    }
+    public int getID() { return id; }
 
     public String getName() {
         return name;
