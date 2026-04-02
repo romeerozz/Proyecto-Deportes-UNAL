@@ -3,63 +3,76 @@ package co.unal.deportesunal.domain;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class Student {
-    private final int ID;
-    private  String name;
-    private LinkedList<SportsEnum> practice;
-    private LinkedList<SportsEnum> interest;
+    private final int id;
+    private String name;
+
+    private final LinkedList<SportEnum> practice;
+    private final LinkedList<SportEnum> interest;
 
     public Student(int id, String name){
-        this.ID = id;
+        this.id = id;
         this.name = name;
         this.practice = new LinkedList<>();
         this.interest = new LinkedList<>();
     }
 
-    public int getID() {
-        return ID;
+    public int getId() { return id; }
+
+    public int getID() { return id; }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
+
+    /**
+     * NOTA: Por ahora se exponen las listas para no bloquear el repositorio TXT.
+     * TODO: cuando exista iteración segura en LinkedList (get(i)/forEach/Iterator),
+     *       reemplazar por métodos de acceso controlados o snapshots.
+     */
+    public LinkedList<SportEnum> getPractice() { return practice; }
+
+    public LinkedList<SportEnum> getInterest() { return interest; }
+
+    public boolean addPractice(SportEnum s){
+        if (s == null) return false;
+        if (practice.contains(s)) return false;
+        practice.pushBack(s);
+        return true;
     }
 
-    public String getName() {
-        return name;
+    public boolean addInterest(SportEnum s){
+        if (s == null) return false;
+        if (interest.contains(s)) return false;
+        interest.pushBack(s);
+        return true;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public boolean removePractice(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        // return practice.remove(s);
+        return false;
     }
 
-    public LinkedList<SportsEnum> getPractice() {
-        return practice;
+    public boolean removeInterest(SportEnum s) {
+        if (s == null) return false;
+        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
+        // return interest.remove(s);
+        return false;
     }
 
-    public void setPractice(LinkedList<SportsEnum> practice) {
-        this.practice = practice;
+    public boolean practices(SportEnum s) {
+        if (s == null) return false;
+        return practice.contains(s);
     }
 
-    public LinkedList<SportsEnum> getInterest() {
-        return interest;
+    public boolean isInterestedIn(SportEnum s) {
+        if (s == null) return false;
+        return interest.contains(s);
     }
 
-    public void setInterest(LinkedList<SportsEnum> interest) {
-        this.interest = interest;
-    }
-
-    public void addPractice(SportsEnum s){
-        if (s == null) {
-            return;
-        }
-
-        if (!practice.contains(s)) {
-            practice.pushBack(s);
-        }
-    }
-
-    public void addInterest(SportsEnum s) {
-        if (s == null) {
-            return;
-        }
-
-        if (!interest.contains(s)) {
-            interest.pushBack(s);
-        }
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name='" + name + "'}";
     }
 }

@@ -1,7 +1,0 @@
-id_estudiante|tipo|deporte
-1|PRACTICA|Futbol
-1|INTERES|Natacion
-2|PRACTICA|Voleibol
-2|INTERES|Futbol
-
-"esto es solo un ejemplo de como se deberia ver"
