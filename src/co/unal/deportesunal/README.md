@@ -1,65 +1,44 @@
-# Entrega 2 - Division de Trabajo
 
-## Alcance Academico (Oficial)
+## Integracion con Persona 2 (Arboles)
 
-Estructuras obligatorias para esta entrega:
-- Arreglos
-- Listas
-- Colas
-- Pilas
-- Arboles (BST, AVL)
+Esta integracion ya quedo iniciada para que Persona 2 solo complete la logica interna de AVL/BST.
 
-Restriccion:
-- No se usan grafos como base funcional en Entrega 2.
-- No se permite usar librerias con estructuras ya implementadas.
-- Las estructuras deben implementarse manualmente.
+### Contrato ya definido
 
-## Persona 1 - EDD base
+Archivo:
+- `structure/tree/StudentIndex.java`
 
-Implementa:
-- structure.array.DinamicArray
-- structure.listadt.LinkedList y structure.listadt.Node
-- structure.stackadt.Stack y structure.stackadt.ArrayStack
-- structure.queue.Queue y structure.queue.ArrayQueue
+Metodos del contrato:
+- `put(int id, Student student)`
+- `get(int id)`
+- `remove(int id)`
+- `valuesInOrder()`
+- `contains(int id)`
+- `size()`
 
-## Persona 2 - Arboles (BST/AVL)
+Excepciones esperadas:
+- `DuplicatedIdException` en `put` si el ID ya existe.
+- `NotFoundException` en `get/remove` si el ID no existe.
 
-Implementa:
-- structure.tree.StudentIndex
-- structure.tree.AvlIndex (obligatorio)
-- structure.tree.BstIndex (recomendado)
+### Punto de acople ya listo
 
-Checklist obligatorio:
-1. Contratos de error en StudentIndex:
-- get(id) lanza NotFoundException si no existe.
-- put(id, student) lanza DuplicatedIdException si el ID ya existe.
-2. AvlIndex completo:
-- put/get/remove con rebalanceo LL/RR/LR/RL.
-- valuesInOrder() ordenado por ID.
-- size() consistente.
-3. BstIndex recomendado:
-- mismo contrato de StudentIndex.
-4. Pruebas minimas:
-- rotaciones LL/RR/LR/RL en AVL.
-- remove de hoja, 1 hijo y 2 hijos.
-- verificacion in-order.
+Archivo:
+- `service/StudentService.java`
 
-## Kevin - Dominio + Servicios + Controlador + Persistencia + Benchmark
+`StudentService` ya depende de `StudentIndex`, por lo que no se debe cambiar su firma publica.
+Persona 2 solo debe terminar la implementacion en:
+- `structure/tree/AvlIndex.java` (obligatorio)
+- `structure/tree/BstIndex.java` (opcional/recomendado)
 
-Implementa:
-- domain/* (Student, SportsEnum, SportsCount, excepciones)
-- persistence/* (StudentRepository, TxtStudentRepository)
-- service/* (StudentService, CommunityService, ConnectionService, StatsService)
-- controller/AppController
-- ui/ConsoleUi
-- benchmark/* (MockDataGenerator, BenchmarkRunner, Timer)
-- AppMain (inyeccion de dependencias y ejecucion)
+### Flujo de integracion recomendado
 
-## Checklist de Integracion
+1. Persona 2 implementa AVL con el contrato actual (sin cambiar interfaz).
+2. Se inyecta `new AvlIndex()` en `StudentService` desde `AppMain` o controlador.
+3. Se valida CRUD basico desde `StudentService`.
+4. Se valida `valuesInOrder()` para listado ordenado por ID.
+5. Se agregan pruebas de rotaciones y eliminacion en AVL.
 
-1. Compila y ejecuta AppMain desde repositorio clonado.
-2. CRUD completo de estudiantes.
-3. Consultas de comunidad sin grafo (segun reglas del enunciado).
-4. Verificacion de conexiones sin usar estructura de grafo.
-5. Estadisticas y ranking por deporte.
-6. Benchmark con salida CSV/TXT en docs/results/.
+### Regla importante de esta entrega
+
+- No usar grafo para resolver consultas funcionales.
+- Toda consulta por ID y ordenamiento por ID debe salir del indice de arbol (AVL/BST).
