@@ -1,15 +1,14 @@
 package co.unal.deportesunal.domain;
-
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class Student {
-    private final int ID;
+    private final int id;
     private  String name;
     private LinkedList<SportEnum> practice;
     private LinkedList<SportEnum> interest;
 
     public Student(int id, String name){
-        this.ID = id;
+        this.id = id;
         this.name = name;
         this.practice = new LinkedList<>();
         this.interest = new LinkedList<>();
@@ -20,7 +19,7 @@ public class Student {
     }
 
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getName() {
@@ -31,19 +30,19 @@ public class Student {
         this.name = name;
     }
 
-    public LinkedList<SportsEnum> getPractice() {
+    public LinkedList<SportEnum> getPractice() {
         return practice;
     }
 
-    public void setPractice(LinkedList<SportsEnum> practice) {
+    public void setPractice(LinkedList<SportEnum> practice) {
         this.practice = practice;
     }
 
-    public LinkedList<SportsEnum> getInterest() {
+    public LinkedList<SportEnum> getInterest() {
         return interest;
     }
 
-    public void setInterest(LinkedList<SportsEnum> interest) {
+    public void setInterest(LinkedList<SportEnum> interest) {
         this.interest = interest;
     }
 
@@ -52,8 +51,6 @@ public class Student {
         // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
         return false;
     }
-}
-
     public boolean removeInterest(SportEnum s) {
         if (s == null) return false;
         // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
@@ -76,3 +73,5 @@ public class Student {
         return "Student{id=" + id + ", name='" + name + "'}";
     }
 }
+
+
