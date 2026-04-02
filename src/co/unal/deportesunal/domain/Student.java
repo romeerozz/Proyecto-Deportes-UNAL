@@ -31,16 +31,8 @@ public class Student {
         return practice;
     }
 
-    public void setPractice(LinkedList<SportsEnum> practice) {
-        this.practice = practice;
-    }
-
     public LinkedList<SportsEnum> getInterest() {
         return interest;
-    }
-
-    public void setInterest(LinkedList<SportsEnum> interest) {
-        this.interest = interest;
     }
 
     public boolean addPractice(SportsEnum s){
