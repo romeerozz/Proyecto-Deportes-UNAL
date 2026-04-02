@@ -1,4 +1,4 @@
 package co.unal.deportesunal.structure.graphadt;
 
-public interface Graph {
+public interface Graph<T> {
 }
