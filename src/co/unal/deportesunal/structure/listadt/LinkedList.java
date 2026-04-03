@@ -161,6 +161,17 @@ public class LinkedList<T> implements listAdt<T> {
     }
 
     @Override
+    public boolean remove(T value) {
+        Position<T> position = find(value);
+        if (position == null) {
+            return false;
+        }
+
+        erase(position);
+        return true;
+    }
+
+    @Override
     public void addBefore(Position<T> position, T value) {
         if (position == null) {
             throw new IllegalArgumentException("Position can not be null.");
@@ -211,5 +222,18 @@ public class LinkedList<T> implements listAdt<T> {
     @Override
     public boolean contains(T value) {
         return find(value) != null;
+    }
+
+    @Override
+    public void traverse(ListVisitor<T> visitor) {
+        if (visitor == null) {
+            throw new IllegalArgumentException("Visitor can not be null.");
+        }
+
+        Node<T> current = head;
+        while (current != null) {
+            visitor.visit(current.getValue());
+            current = current.getNext();
+        }
     }
 }
