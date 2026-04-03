@@ -149,7 +149,12 @@ public class ConsoleUi {
                         System.out.println(controller.removeInterestSport(id, sp) ? "Removido." : "No estaba.");
                     }
                     case 5 -> printSportsCatalog();
-                    case 0 -> back = true;
+                    case 0 -> {
+                        System.out.print("¿Guardar antes de salir? (s/n): ");
+                        String ans = sc.nextLine().trim().toLowerCase();
+                        if (ans.equals("s")) saveFlow();
+                        back = true;
+                    }
                     default -> System.out.println("Opción inválida.");
                 }
             } catch (Exception e) {
