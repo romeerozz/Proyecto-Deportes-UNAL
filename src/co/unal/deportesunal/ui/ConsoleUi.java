@@ -17,8 +17,20 @@ public class ConsoleUi {
         this.controller = controller;
     }
 
+    private void autoLoadOnStart() {
+        try {
+            controller.load();
+            System.out.println("Datos cargados desde archivo.");
+            System.out.println("Total estudiantes: " + controller.totalStudents());
+        } catch (Exception e) {
+            System.out.println("No se pudo cargar (archivo vacío o error): " + e.getMessage());
+        }
+    }
+
     public void run() {
         System.out.println("=== Deportes UNAL - Prototipo (Consola) ===");
+
+        autoLoadOnStart();
 
         boolean exit = false;
         while (!exit) {
@@ -43,7 +55,7 @@ public class ConsoleUi {
         System.out.println("\n--- Menú principal ---");
         System.out.println("1) Modo interactivo (CRUD)");
         System.out.println("2) Ejecutar benchmarks");
-        System.out.println("3) Cargar desde archivo");
+        System.out.println("3) Recargar desde el archivo (sobreescribe el estado actual)");
         System.out.println("4) Guardar a archivo");
         System.out.println("0) Salir");
     }
@@ -174,9 +186,16 @@ public class ConsoleUi {
     }
 
     private void loadFlow() {
+        System.out.println("⚠️  Esto recargará desde archivo y reemplazará los datos actuales en memoria.");
+        String ans = readLine("¿Continuar? (s/n): ").trim().toLowerCase();
+        if (!ans.equals("s")) {
+            System.out.println("Recarga cancelada.");
+            return;
+        }
+
         try {
             controller.load();
-            System.out.println("Datos cargados.");
+            System.out.println("Datos cargados. Total estudiantes: " + controller.totalStudents());
         } catch (Exception e) {
             System.out.println("ERROR al cargar: " + e.getMessage());
         }
