@@ -60,7 +60,6 @@ public class TxtStudentRepository implements StudentRepository {
             bw.write("# id;name;PRACTICE(comma);INTEREST(comma)");
             bw.newLine();
 
-            // ✅ Ya tenemos iteración: traverse(ListVisitor<T>)
             students.traverse(new ListVisitor<Student>() {
                 @Override
                 public void visit(Student s) {
@@ -75,7 +74,6 @@ public class TxtStudentRepository implements StudentRepository {
             });
 
         } catch (RuntimeException e) {
-            // Si viene de un IOException dentro del visitor
             if (e.getCause() instanceof IOException) {
                 throw new DataAccessException("There was an error writing the file", e.getCause());
             }
@@ -129,7 +127,6 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String serializeStudent(Student s) {
-        // Si decidieron mantener getID() en lugar de getId(), cambia aquí.
         return s.getId() + ";" +
                 escapeName(s.getName()) + ";" +
                 joinSports(s, true) + ";" +
@@ -137,7 +134,6 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String escapeName(String name) {
-        // Evita ';' en nombres para no romper el formato
         return name == null ? "" : name.replace(";", " ");
     }
 
@@ -146,7 +142,6 @@ public class TxtStudentRepository implements StudentRepository {
 
         LinkedList<SportEnum> list = practice ? s.getPractice() : s.getInterest();
 
-        // ✅ Iteración con traverse(ListVisitor<T>)
         list.traverse(new ListVisitor<SportEnum>() {
             @Override
             public void visit(SportEnum sport) {
