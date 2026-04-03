@@ -55,6 +55,18 @@ public class StructureSanityTests {
         assertEquals("C", popBack, "LinkedList popBack");
         assertEquals(1, list.size(), "LinkedList size after pops");
         assertEquals("B", list.topFront(), "LinkedList remaining element");
+
+        list.pushBack("D");
+        boolean removed = list.remove("B");
+
+        assertTrue(removed, "LinkedList remove(value) should return true when element exists");
+        assertTrue(!list.contains("B"), "LinkedList should no longer contain removed value");
+        assertEquals(1, list.size(), "LinkedList size after remove(value)");
+
+        StringBuilder iteration = new StringBuilder();
+        list.traverse(iteration::append);
+
+        assertEquals("D", iteration.toString(), "LinkedList traverse traversal");
     }
 
     private static void testStack() {
