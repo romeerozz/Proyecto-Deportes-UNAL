@@ -63,7 +63,7 @@ public class ListStudentIndex implements StudentIndex {
         data.traverse(new ListVisitor<Student>() {
             @Override
             public void visit(Student s) {
-                if (result[0] != null) return; 
+                if (result[0] != null) return;
                 if (s != null && s.getId() == id) {
                     result[0] = s;
                 }
