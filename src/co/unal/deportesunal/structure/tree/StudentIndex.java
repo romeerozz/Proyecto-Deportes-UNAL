@@ -8,7 +8,7 @@ import co.unal.deportesunal.structure.listadt.LinkedList;
 public interface StudentIndex {
 	void put(int id, Student student) throws DuplicatedIdException;
 	Student get(int id) throws NotFoundException;
-	Student remove(int id) throws NotFoundException;
+	boolean remove(int id);
 	LinkedList<Student> valuesInOrder();
 	boolean contains(int id);
 	int size();

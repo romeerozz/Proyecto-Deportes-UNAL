@@ -15,8 +15,8 @@ public class AvlIndex implements StudentIndex {
 	}
 
 	@Override
-	public Student remove(int id) {
-		throw new UnsupportedOperationException("AVL implementation pending.");
+	public boolean remove(int id) {
+        return false;
 	}
 
 	@Override

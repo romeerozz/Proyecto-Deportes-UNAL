@@ -15,8 +15,8 @@ public class BstIndex implements StudentIndex {
 	}
 
 	@Override
-	public Student remove(int id) {
-		throw new UnsupportedOperationException("BST implementation pending.");
+	public boolean remove(int id) {
+		return false;
 	}
 
 	@Override
