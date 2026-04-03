@@ -217,7 +217,7 @@ public class ConsoleUi {
 
     private SportEnum readSportEnum() {
         printSportsCatalog();
-        String raw = readLine("Código deporte (ej: FUTBOL, NATACION): ").trim().toUpperCase();
+        String raw = readLine("Código deporte (ej: FUTBOL, NATACIÓN): ").trim().toUpperCase();
         try {
             return SportEnum.valueOf(raw);
         } catch (IllegalArgumentException e) {
@@ -236,7 +236,7 @@ public class ConsoleUi {
     private void printStudent(Student s) {
         System.out.println("ID=" + s.getId() + " | Nombre=" + s.getName());
         System.out.println("  Practica: " + joinSports(s.getPractice()));
-        System.out.println("  Interes : " + joinSports(s.getInterest()));
+        System.out.println("  Interés : " + joinSports(s.getInterest()));
         System.out.println();
     }
 
@@ -246,10 +246,10 @@ public class ConsoleUi {
             @Override
             public void visit(SportEnum sp) {
                 if (sp == null) return;
-                if (sb.length() > 0) sb.append(", ");
+                if (!sb.isEmpty()) sb.append(", ");
                 sb.append(sp.displayName());
             }
         });
-        return sb.length() == 0 ? "(vacio)" : sb.toString();
+        return sb.isEmpty() ? "(vacio)" : sb.toString();
     }
 }
