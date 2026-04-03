@@ -1,6 +1,7 @@
 package co.unal.deportesunal.domain;
 
 import co.unal.deportesunal.structure.listadt.LinkedList;
+import co.unal.deportesunal.structure.listadt.ListVisitor;
 
 public class Student {
     private final int id;
@@ -18,17 +19,13 @@ public class Student {
 
     public int getId() { return id; }
 
-    public int getID() { return id; }
-
     public String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        // opcional: validar null/vacío
+        this.name = name;
+    }
 
-    /**
-     * NOTA: Por ahora se exponen las listas para no bloquear el repositorio TXT.
-     * TODO: cuando exista iteración segura en LinkedList (get(i)/forEach/Iterator),
-     *       reemplazar por métodos de acceso controlados o snapshots.
-     */
     public LinkedList<SportEnum> getPractice() { return practice; }
 
     public LinkedList<SportEnum> getInterest() { return interest; }
@@ -65,6 +62,27 @@ public class Student {
     public boolean isInterestedIn(SportEnum s) {
         if (s == null) return false;
         return interest.contains(s);
+    }
+
+    /**
+     * Útil para construir el grafo:
+     * @return true si comparten al menos un deporte practicado.
+     */
+    public boolean sharesPracticeWith(Student other) {
+        if (other == null) return false;
+
+        final boolean[] shared = { false };
+
+        this.practice.traverse(new ListVisitor<SportEnum>() {
+            @Override
+            public void visit(SportEnum sport) {
+                if (!shared[0] && sport != null && other.practice.contains(sport)) {
+                    shared[0] = true;
+                }
+            }
+        });
+
+        return shared[0];
     }
 
     @Override

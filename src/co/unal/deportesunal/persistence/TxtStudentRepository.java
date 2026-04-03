@@ -4,6 +4,7 @@ import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.exception.DataAccessException;
 import co.unal.deportesunal.structure.listadt.LinkedList;
+import co.unal.deportesunal.structure.listadt.ListVisitor;
 
 import java.io.*;
 
@@ -59,11 +60,26 @@ public class TxtStudentRepository implements StudentRepository {
             bw.write("# id;name;PRACTICE(comma);INTEREST(comma)");
             bw.newLine();
 
-            // TODO: Depende de cómo se implemente la iteración en LinkedList:
-            //  - Opción A: students.get(i)
-            //  - Opción B: students.forEach(Visitor<Student>)
-            //  - Opción C: Iterator (Iterable)
+            // ✅ Ya tenemos iteración: traverse(ListVisitor<T>)
+            students.traverse(new ListVisitor<Student>() {
+                @Override
+                public void visit(Student s) {
+                    try {
+                        bw.write(serializeStudent(s));
+                        bw.newLine();
+                    } catch (IOException e) {
+                        // No podemos lanzar checked exception desde aquí, así que envolvemos
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
 
+        } catch (RuntimeException e) {
+            // Si viene de un IOException dentro del visitor
+            if (e.getCause() instanceof IOException) {
+                throw new DataAccessException("There was an error writing the file", e.getCause());
+            }
+            throw e;
         } catch (IOException e) {
             throw new DataAccessException("There was an error writing the file", e);
         }
@@ -113,7 +129,7 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String serializeStudent(Student s) {
-        // TODO: Ajustar según la firma final de Student (getId() vs getID()).
+        // Si decidieron mantener getID() en lugar de getId(), cambia aquí.
         return s.getId() + ";" +
                 escapeName(s.getName()) + ";" +
                 joinSports(s, true) + ";" +
@@ -126,8 +142,20 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String joinSports(Student s, boolean practice) {
-        // TODO: Esto depende de cómo se exponga/itere la lista de deportes en Student y LinkedList.
+        final StringBuilder sb = new StringBuilder();
 
-        return "";
+        LinkedList<SportEnum> list = practice ? s.getPractice() : s.getInterest();
+
+        // ✅ Iteración con traverse(ListVisitor<T>)
+        list.traverse(new ListVisitor<SportEnum>() {
+            @Override
+            public void visit(SportEnum sport) {
+                if (sport == null) return;
+                if (sb.length() > 0) sb.append(",");
+                sb.append(sport.name());
+            }
+        });
+
+        return sb.toString();
     }
 }
