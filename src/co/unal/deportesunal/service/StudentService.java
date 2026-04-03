@@ -19,7 +19,7 @@ public class StudentService {
 		return studentIndex.get(id);
 	}
 
-	public Student removeStudentById(int id) {
+	public boolean removeStudentById(int id) {
 		return studentIndex.remove(id);
 	}
 
