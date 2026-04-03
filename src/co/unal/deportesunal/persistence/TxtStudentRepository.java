@@ -28,6 +28,9 @@ public class TxtStudentRepository implements StudentRepository {
         } catch (IOException e) {
             throw new DataAccessException("There was an error initializing students file", e);
         }
+        System.out.println("user.dir = " + System.getProperty("user.dir"));
+        System.out.println("students abs = " + fileLocation.getAbsolutePath());
+        System.out.println("exists=" + fileLocation.exists() + ", length=" + fileLocation.length());
     }
 
     @Override
