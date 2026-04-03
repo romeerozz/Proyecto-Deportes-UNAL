@@ -11,7 +11,9 @@ public interface listAdt<T> {
     int size();
     Position<T> find(T value);
     void erase(Position<T> position);
+    boolean remove(T value);
     void addBefore(Position<T> position, T value);
     void addAfter(Position<T> position, T value);
     boolean contains(T value);
+    void traverse(ListVisitor<T> visitor);
 }
