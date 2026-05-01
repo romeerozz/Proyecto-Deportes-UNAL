@@ -1,7 +1,7 @@
 package co.unal.deportesunal.benchmark.factories;
 
-import co.unal.deportesunal.structure.tree.ListStudentIndex;
-import co.unal.deportesunal.structure.tree.StudentIndex;
+import co.unal.deportesunal.structure.index.ListStudentIndex;
+import co.unal.deportesunal.structure.index.StudentIndex;
 
 public class ListIndexFactory implements IndexFactory {
     @Override

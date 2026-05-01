@@ -2,7 +2,7 @@ package co.unal.deportesunal.benchmark;
 
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.structure.listadt.LinkedList;
-import co.unal.deportesunal.structure.tree.StudentIndex;
+import co.unal.deportesunal.structure.index.StudentIndex;
 
 public class IndexBenchmark {
 

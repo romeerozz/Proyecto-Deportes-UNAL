@@ -1,16 +1,20 @@
 package co.unal.deportesunal.structure.tree;
 
-import list.SinglyLinkedList;
+import co.unal.deportesunal.structure.listadt.LinkedList;
 
-public interface Tree<T extends Comparable<T>> {
+public interface Tree<K extends Comparable<K>, V> {
 
-    boolean contains(T value);
+    void put(K key, V value);
 
-    void insert(T value);
+    V get(K key);
 
-    boolean remove(T value);
+    boolean contains(K key);
+
+    boolean remove(K key);
 
     int size();
 
-    SinglyLinkedList<T> inOrder();
+    boolean isEmpty();
+
+    LinkedList<V> valuesInOrder();
 }
