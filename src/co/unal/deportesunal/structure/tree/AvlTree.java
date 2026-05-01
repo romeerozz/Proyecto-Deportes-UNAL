@@ -1,176 +1,130 @@
 package co.unal.deportesunal.structure.tree;
 
-import list.SinglyLinkedList;
+import co.unal.deportesunal.structure.listadt.LinkedList;
+import co.unal.deportesunal.structure.stackadt.ArrayStack;
+import co.unal.deportesunal.structure.stackadt.Stack;
 
-public class AvlTree<T extends Comparable<T>> implements Tree<T> {
+public class AvlTree<K extends Comparable<K>, V> implements Tree<K, V> {
 
     private Node root;
     private int size;
 
     private class Node {
-        T value;
+        K key;
+        V value;
         Node left;
         Node right;
         int height;
 
-        Node(T value) {
+        Node(K key, V value) {
+            this.key = key;
             this.value = value;
             this.height = 1;
         }
     }
 
     public AvlTree() {
-        root = null;
-        size = 0;
-    }
-
-    private int height(Node node) {
-        return node == null ? 0 : node.height;
-    }
-
-    private int getBalance(Node node) {
-        return node == null ? 0 : height(node.left) - height(node.right);
-    }
-
-    private Node rotateRight(Node y) {
-        Node x = y.left;
-        Node T2 = x.right;
-
-        x.right = y;
-        y.left = T2;
-
-        y.height = 1 + Math.max(height(y.left), height(y.right));
-        x.height = 1 + Math.max(height(x.left), height(x.right));
-
-        return x;
-    }
-
-    private Node rotateLeft(Node x) {
-        Node y = x.right;
-        Node T2 = y.left;
-
-        y.left = x;
-        x.right = T2;
-
-        x.height = 1 + Math.max(height(x.left), height(x.right));
-        y.height = 1 + Math.max(height(y.left), height(y.right));
-
-        return y;
+        this.root = null;
+        this.size = 0;
     }
 
     @Override
-    public void insert(T value) {
-        root = insert(root, value);
-    }
-
-    private Node insert(Node node, T value) {
-        if (node == null) {
-            size++;
-            return new Node(value);
+    public void put(K key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null.");
         }
 
-        int cmp = value.compareTo(node.value);
+        root = put(root, key, value);
+    }
+
+    private Node put(Node node, K key, V value) {
+        if (node == null) {
+            size++;
+            return new Node(key, value);
+        }
+
+        int cmp = key.compareTo(node.key);
 
         if (cmp < 0) {
-            node.left = insert(node.left, value);
+            node.left = put(node.left, key, value);
         } else if (cmp > 0) {
-            node.right = insert(node.right, value);
+            node.right = put(node.right, key, value);
         } else {
+            node.value = value;
             return node;
         }
 
-        node.height = 1 + Math.max(height(node.left), height(node.right));
-
-        int balance = getBalance(node);
-
-        // LL
-        if (balance > 1 && value.compareTo(node.left.value) < 0) {
-            return rotateRight(node);
-        }
-
-        // RR
-        if (balance < -1 && value.compareTo(node.right.value) > 0) {
-            return rotateLeft(node);
-        }
-
-        // LR
-        if (balance > 1 && value.compareTo(node.left.value) > 0) {
-            node.left = rotateLeft(node.left);
-            return rotateRight(node);
-        }
-
-        // RL
-        if (balance < -1 && value.compareTo(node.right.value) < 0) {
-            node.right = rotateRight(node.right);
-            return rotateLeft(node);
-        }
-
-        return node;
+        updateHeight(node);
+        return rebalance(node);
     }
 
     @Override
-    public boolean remove(T value) {
-        if (!contains(value)) return false;
-        root = remove(root, value);
+    public V get(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null.");
+        }
+
+        Node node = getNode(root, key);
+        return node == null ? null : node.value;
+    }
+
+    private Node getNode(Node node, K key) {
+        if (node == null) return null;
+
+        int cmp = key.compareTo(node.key);
+
+        if (cmp == 0) return node;
+        if (cmp < 0) return getNode(node.left, key);
+        return getNode(node.right, key);
+    }
+
+    @Override
+    public boolean contains(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null.");
+        }
+
+        return getNode(root, key) != null;
+    }
+
+    @Override
+    public boolean remove(K key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key cannot be null.");
+        }
+
+        if (!contains(key)) return false;
+
+        root = remove(root, key);
         size--;
         return true;
     }
 
-    private Node remove(Node node, T value) {
+    private Node remove(Node node, K key) {
         if (node == null) return null;
 
-        int cmp = value.compareTo(node.value);
+        int cmp = key.compareTo(node.key);
 
         if (cmp < 0) {
-            node.left = remove(node.left, value);
+            node.left = remove(node.left, key);
         } else if (cmp > 0) {
-            node.right = remove(node.right, value);
+            node.right = remove(node.right, key);
         } else {
-            // nodo con 1 o ningún hijo
-            if (node.left == null || node.right == null) {
-                Node temp = (node.left != null) ? node.left : node.right;
+            // Caso 1: nodo sin hijos o con un solo hijo
+            if (node.left == null) return node.right;
+            if (node.right == null) return node.left;
 
-                if (temp == null) {
-                    return null;
-                } else {
-                    node = temp;
-                }
-            } else {
-                Node successor = getMin(node.right);
-                node.value = successor.value;
-                node.right = remove(node.right, successor.value);
-            }
+            // Caso 2: nodo con dos hijos
+            Node successor = getMin(node.right);
+
+            node.key = successor.key;
+            node.value = successor.value;
+
+            node.right = remove(node.right, successor.key);
         }
 
-        if (node == null) return null;
-
-        node.height = 1 + Math.max(height(node.left), height(node.right));
-
-        int balance = getBalance(node);
-
-        // LL
-        if (balance > 1 && getBalance(node.left) >= 0) {
-            return rotateRight(node);
-        }
-
-        // LR
-        if (balance > 1 && getBalance(node.left) < 0) {
-            node.left = rotateLeft(node.left);
-            return rotateRight(node);
-        }
-
-        // RR
-        if (balance < -1 && getBalance(node.right) <= 0) {
-            return rotateLeft(node);
-        }
-
-        // RL
-        if (balance < -1 && getBalance(node.right) > 0) {
-            node.right = rotateRight(node.right);
-            return rotateLeft(node);
-        }
-
-        return node;
+        updateHeight(node);
+        return rebalance(node);
     }
 
     private Node getMin(Node node) {
@@ -180,19 +134,85 @@ public class AvlTree<T extends Comparable<T>> implements Tree<T> {
         return node;
     }
 
-    @Override
-    public boolean contains(T value) {
-        return contains(root, value);
+    private int height(Node node) {
+        return node == null ? 0 : node.height;
     }
 
-    private boolean contains(Node node, T value) {
-        if (node == null) return false;
+    private void updateHeight(Node node) {
+        node.height = 1 + Math.max(height(node.left), height(node.right));
+    }
 
-        int cmp = value.compareTo(node.value);
+    private int balanceFactor(Node node) {
+        return node == null ? 0 : height(node.left) - height(node.right);
+    }
 
-        if (cmp == 0) return true;
-        else if (cmp < 0) return contains(node.left, value);
-        else return contains(node.right, value);
+    private Node rebalance(Node node) {
+        int balance = balanceFactor(node);
+
+        if (balance > 1) {
+            if (balanceFactor(node.left) < 0) {
+                node.left = rotateLeft(node.left); // LR
+            }
+            return rotateRight(node); // LL
+        }
+
+        if (balance < -1) {
+            if (balanceFactor(node.right) > 0) {
+                node.right = rotateRight(node.right); // RL
+            }
+            return rotateLeft(node); // RR
+        }
+
+        return node;
+    }
+
+    private Node rotateRight(Node y) {
+        Node x = y.left;
+        Node t2 = x.right;
+
+        x.right = y;
+        y.left = t2;
+
+        updateHeight(y);
+        updateHeight(x);
+
+        return x;
+    }
+
+    private Node rotateLeft(Node x) {
+        Node y = x.right;
+        Node t2 = y.left;
+
+        y.left = x;
+        x.right = t2;
+
+        updateHeight(x);
+        updateHeight(y);
+
+        return y;
+    }
+
+    @Override
+    public LinkedList<V> valuesInOrder() {
+        LinkedList<V> values = new LinkedList<>();
+
+        Stack<Node> stack = new ArrayStack<>();
+        Node current = root;
+
+        while (current != null || !stack.isEmpty()) {
+
+            while (current != null) {
+                stack.push(current);
+                current = current.left;
+            }
+
+            current = stack.pop();
+            values.pushBack(current.value);
+
+            current = current.right;
+        }
+
+        return values;
     }
 
     @Override
@@ -201,17 +221,7 @@ public class AvlTree<T extends Comparable<T>> implements Tree<T> {
     }
 
     @Override
-    public SinglyLinkedList<T> inOrder() {
-        SinglyLinkedList<T> list = new SinglyLinkedList<>();
-        inOrder(root, list);
-        return list;
-    }
-
-    private void inOrder(Node node, SinglyLinkedList<T> list) {
-        if (node == null) return;
-
-        inOrder(node.left, list);
-        list.pushBack(node.value);
-        inOrder(node.right, list);
+    public boolean isEmpty() {
+        return size == 0;
     }
 }
