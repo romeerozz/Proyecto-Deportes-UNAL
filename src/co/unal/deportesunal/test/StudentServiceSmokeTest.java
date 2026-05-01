@@ -7,8 +7,8 @@ import co.unal.deportesunal.persistence.FileConstant;
 import co.unal.deportesunal.persistence.TxtStudentRepository;
 import co.unal.deportesunal.service.StudentService;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
-import co.unal.deportesunal.structure.tree.ListStudentIndex;
-import co.unal.deportesunal.structure.tree.StudentIndex;
+import co.unal.deportesunal.structure.index.ListStudentIndex;
+import co.unal.deportesunal.structure.index.StudentIndex;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -8,7 +8,7 @@ import co.unal.deportesunal.domain.exception.NotFoundException;
 import co.unal.deportesunal.persistence.StudentRepository;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
-import co.unal.deportesunal.structure.tree.StudentIndex;
+import co.unal.deportesunal.structure.index.StudentIndex;
 
 import java.io.IOException;
 
