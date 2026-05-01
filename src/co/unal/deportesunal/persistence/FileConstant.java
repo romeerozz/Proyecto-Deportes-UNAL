@@ -3,17 +3,17 @@ package co.unal.deportesunal.persistence;
 import java.io.File;
 
 public class FileConstant {
-    public static final String BASE_DIR =
+    public static final String DATA_DIR =
             System.getProperty("user.dir") + File.separator + "data";
 
     public static final String PERSISTENCE_DIR =
-            BASE_DIR + File.separator + "persistence";
+            DATA_DIR + File.separator + "persistence";
 
     public static final String MOCK_DIR =
-            BASE_DIR + File.separator + "mock";
+            DATA_DIR + File.separator + "mock";
 
     public static final String RESULTS_DIR =
-            BASE_DIR + File.separator + "results";
+            DATA_DIR + File.separator + "results";
 
     public static final String STUDENTS_FILE =
             PERSISTENCE_DIR + File.separator + "students.txt";
