@@ -3,6 +3,7 @@ package co.unal.deportesunal.persistence;
 import java.io.File;
 
 public class FileConstant {
+
     public static final String DATA_DIR =
             System.getProperty("user.dir") + File.separator + "data";
 
