@@ -1,4 +1,4 @@
-package tree;
+package co.unal.deportesunal.structure.tree;
 
 import list.SinglyLinkedList;
 

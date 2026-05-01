@@ -1,6 +1,7 @@
 package co.unal.deportesunal.structure.tree;
 
 import co.unal.deportesunal.domain.Student;
+import co.unal.deportesunal.structure.index.StudentIndex;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 
 public class BstIndex implements StudentIndex {
