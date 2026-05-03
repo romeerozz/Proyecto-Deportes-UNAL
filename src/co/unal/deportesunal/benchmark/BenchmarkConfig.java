@@ -7,7 +7,22 @@ public class BenchmarkConfig {
     public final int getQueriesFactor;
     public final int removeFactor;
 
+    public final int warmupTrials;
+    public final int warmupSize;
+
     public BenchmarkConfig(int[] sizes, int trials, long seed, int getQueriesFactor, int removeFactor) {
+        this(sizes, trials, seed, getQueriesFactor, removeFactor, 1, 1_000);
+    }
+
+    public BenchmarkConfig(
+            int[] sizes,
+            int trials,
+            long seed,
+            int getQueriesFactor,
+            int removeFactor,
+            int warmupTrials,
+            int warmupSize
+    ) {
         validateSizes(sizes);
 
         if (trials <= 0) {
@@ -22,11 +37,21 @@ public class BenchmarkConfig {
             throw new IllegalArgumentException("Remove factor must be greater than 0.");
         }
 
+        if (warmupTrials < 0) {
+            throw new IllegalArgumentException("Warmup trials cannot be negative.");
+        }
+
+        if (warmupSize <= 0) {
+            throw new IllegalArgumentException("Warmup size must be greater than 0.");
+        }
+
         this.sizes = copyArray(sizes);
         this.trials = trials;
         this.seed = seed;
         this.getQueriesFactor = getQueriesFactor;
         this.removeFactor = removeFactor;
+        this.warmupTrials = warmupTrials;
+        this.warmupSize = warmupSize;
     }
 
     public int getQueryCount(int n) {
@@ -52,9 +77,11 @@ public class BenchmarkConfig {
 
     private int[] copyArray(int[] source) {
         int[] copy = new int[source.length];
+
         for (int i = 0; i < source.length; i++) {
             copy[i] = source[i];
         }
+
         return copy;
     }
 
@@ -64,7 +91,9 @@ public class BenchmarkConfig {
                 3,
                 42L,
                 1,
-                10
+                10,
+                1,
+                10_000
         );
     }
 
@@ -74,7 +103,9 @@ public class BenchmarkConfig {
                 2,
                 42L,
                 1,
-                10
+                10,
+                1,
+                1_000
         );
     }
 }
