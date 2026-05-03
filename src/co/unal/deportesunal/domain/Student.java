@@ -46,15 +46,12 @@ public class Student {
 
     public boolean removePractice(SportEnum s) {
         if (s == null) return false;
-        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
-        return false;
+        return practice.remove(s);
     }
 
     public boolean removeInterest(SportEnum s) {
         if (s == null) return false;
-        // TODO: cuando LinkedList tenga remove(value) o wrapper find+erase:
-        // return interest.remove(s);
-        return false;
+        return interest.remove(s);
     }
 
     public boolean practices(SportEnum s) {
