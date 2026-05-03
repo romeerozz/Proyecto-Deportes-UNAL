@@ -49,6 +49,7 @@ public class BenchmarkRunner {
                         BenchmarkOperation.GET,
                         BenchmarkOperation.REMOVE
                 },
+                FileConstant.INDEX_BENCHMARK_FULL,
                 false
         );
     }
@@ -59,27 +60,33 @@ public class BenchmarkRunner {
             BenchmarkOperation[] operations
     ) throws IOException, DataAccessException {
 
-        runOperations(config, factories, operations, false);
+        runOperations(
+                config,
+                factories,
+                operations,
+                FileConstant.indexBenchmarkResult("custom"),
+                false
+        );
     }
 
     public void runOperations(
             BenchmarkConfig config,
             IndexFactory[] factories,
             BenchmarkOperation[] operations,
+            String outputPath,
             boolean append
     ) throws IOException, DataAccessException {
 
         validateConfig(config);
         validateFactories(factories);
         validateOperations(operations);
+        validateOutputPath(outputPath);
 
         runWarmup(config, factories, operations);
 
-        String resultPath = FileConstant.INDEX_BENCHMARK_RESULTS;
+        try (CsvWriter writer = new SimpleCsvWriter(outputPath, append)) {
 
-        try (CsvWriter writer = new SimpleCsvWriter(resultPath, append)) {
-
-            if (shouldWriteHeader(resultPath, append)) {
+            if (shouldWriteHeader(outputPath, append)) {
                 writer.writeHeader(
                         "structure",
                         "operation",
@@ -145,7 +152,13 @@ public class BenchmarkRunner {
         }
 
         System.out.println("\nBenchmarks finalizados.");
-        System.out.println("Resultados CSV: " + resultPath);
+        System.out.println("Resultados CSV: " + outputPath);
+    }
+
+    private void validateOutputPath(String outputPath) {
+        if (outputPath == null || outputPath.trim().isEmpty()) {
+            throw new IllegalArgumentException("Output path cannot be null or empty.");
+        }
     }
 
     private void runWarmup(

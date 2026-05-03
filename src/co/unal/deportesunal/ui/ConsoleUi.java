@@ -238,6 +238,7 @@ public class ConsoleUi {
                             BenchmarkConfig.defaultConfig(),
                             allFactories(),
                             allOperations(),
+                            FileConstant.INDEX_BENCHMARK_FULL,
                             false
                     );
 
@@ -245,6 +246,7 @@ public class ConsoleUi {
                             BenchmarkConfig.quickConfig(),
                             allFactories(),
                             allOperations(),
+                            FileConstant.indexBenchmarkResult("quick"),
                             false
                     );
 
@@ -252,6 +254,7 @@ public class ConsoleUi {
                             BenchmarkConfig.defaultConfig(),
                             allFactories(),
                             new BenchmarkOperation[]{BenchmarkOperation.PUT},
+                            FileConstant.indexBenchmarkResult("put"),
                             false
                     );
 
@@ -259,6 +262,7 @@ public class ConsoleUi {
                             BenchmarkConfig.defaultConfig(),
                             allFactories(),
                             new BenchmarkOperation[]{BenchmarkOperation.GET},
+                            FileConstant.indexBenchmarkResult("get"),
                             false
                     );
 
@@ -266,6 +270,7 @@ public class ConsoleUi {
                             BenchmarkConfig.defaultConfig(),
                             allFactories(),
                             new BenchmarkOperation[]{BenchmarkOperation.REMOVE},
+                            FileConstant.indexBenchmarkResult("remove"),
                             false
                     );
 
@@ -296,15 +301,16 @@ public class ConsoleUi {
             BenchmarkConfig config,
             IndexFactory[] factories,
             BenchmarkOperation[] operations,
+            String outputPath,
             boolean append
     ) throws Exception {
         System.out.println("\nEjecutando benchmark...");
-        System.out.println("Resultados: " + FileConstant.INDEX_BENCHMARK_RESULTS);
+        System.out.println("Resultados: " + outputPath);
 
-        benchmarkRunner.runOperations(config, factories, operations, append);
+        benchmarkRunner.runOperations(config, factories, operations, outputPath, append);
 
         System.out.println("Benchmark terminado.");
-        System.out.println("CSV generado en: " + FileConstant.INDEX_BENCHMARK_RESULTS);
+        System.out.println("CSV generado en: " + outputPath);
     }
 
     private void runBenchmarkByStructure() throws Exception {
@@ -344,7 +350,17 @@ public class ConsoleUi {
 
         boolean append = askAppendResults();
 
-        runBenchmark(config, factories, operations, append);
+        String label = readLine("Nombre para el archivo CSV (ej: avl_put, bst_avl_get): ")
+                .trim()
+                .toLowerCase();
+
+        if (label.isEmpty()) {
+            label = "custom";
+        }
+
+        String outputPath = FileConstant.indexBenchmarkResult(label);
+
+        runBenchmark(config, factories, operations, outputPath, append);
     }
 
     private BenchmarkOperation[] chooseOperations() {
