@@ -19,7 +19,12 @@ public class MockDataGenerator {
         Random random = new Random(seed);
         LinkedList<Student> students = new LinkedList<>();
 
-        for (int id = 1; id <= n; id++) {
+        int[] ids = generateSequentialIds(n);
+        shuffle(ids, random);
+
+        for (int i = 0; i < ids.length; i++) {
+            int id = ids[i];
+
             Student student = new Student(id, buildName(id));
 
             int practiceCount = randomSportCount(random);
@@ -69,13 +74,9 @@ public class MockDataGenerator {
             throw new IllegalArgumentException("count must be between 0 and n.");
         }
 
-        int[] ids = new int[n];
-
-        for (int i = 0; i < n; i++) {
-            ids[i] = i + 1;
-        }
-
-        shuffle(ids, seed);
+        int[] ids = generateSequentialIds(n);
+        Random random = new Random(seed);
+        shuffle(ids, random);
 
         int[] result = new int[count];
         for (int i = 0; i < count; i++) {
@@ -83,6 +84,16 @@ public class MockDataGenerator {
         }
 
         return result;
+    }
+
+    private int[] generateSequentialIds(int n) {
+        int[] ids = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            ids[i] = i + 1;
+        }
+
+        return ids;
     }
 
     private void addRandomSports(Student student, int count, boolean practice, Random random) {
@@ -125,9 +136,7 @@ public class MockDataGenerator {
         return sb.toString();
     }
 
-    private void shuffle(int[] array, long seed) {
-        Random random = new Random(seed);
-
+    private void shuffle(int[] array, Random random) {
         for (int i = array.length - 1; i > 0; i--) {
             int j = random.nextInt(i + 1);
 

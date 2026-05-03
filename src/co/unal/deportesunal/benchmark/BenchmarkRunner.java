@@ -73,6 +73,8 @@ public class BenchmarkRunner {
         validateFactories(factories);
         validateOperations(operations);
 
+        runWarmup(config, factories, operations);
+
         String resultPath = FileConstant.INDEX_BENCHMARK_RESULTS;
 
         try (CsvWriter writer = new SimpleCsvWriter(resultPath, append)) {
@@ -144,6 +146,78 @@ public class BenchmarkRunner {
 
         System.out.println("\nBenchmarks finalizados.");
         System.out.println("Resultados CSV: " + resultPath);
+    }
+
+    private void runWarmup(
+            BenchmarkConfig config,
+            IndexFactory[] factories,
+            BenchmarkOperation[] operations
+    ) {
+        if (config.warmupTrials == 0) {
+            return;
+        }
+
+        System.out.println("\n=== Warmup JVM ===");
+
+        int n = config.warmupSize;
+
+        for (int warmup = 1; warmup <= config.warmupTrials; warmup++) {
+            long warmupSeed = config.seed + 999_000L + warmup;
+
+            LinkedList<Student> students = generator.generateStudents(n, warmupSeed);
+
+            int queryCount = config.getQueryCount(n);
+            int removeCount = config.getRemoveCount(n);
+
+            int[] queryIds = generator.generateRandomIds(
+                    n,
+                    queryCount,
+                    warmupSeed + 10_000
+            );
+
+            int[] removeIds = generator.generateUniqueRandomIds(
+                    n,
+                    removeCount,
+                    warmupSeed + 20_000
+            );
+
+            for (IndexFactory factory : factories) {
+                runWarmupForFactory(
+                        factory,
+                        students,
+                        queryIds,
+                        removeIds,
+                        operations
+                );
+            }
+        }
+
+        System.out.println("Warmup terminado.\n");
+    }
+
+    private void runWarmupForFactory(
+            IndexFactory factory,
+            LinkedList<Student> students,
+            int[] queryIds,
+            int[] removeIds,
+            BenchmarkOperation[] operations
+    ) {
+        if (shouldRun(operations, BenchmarkOperation.PUT)) {
+            StudentIndex putIndex = factory.create();
+            indexBenchmark.benchPut(putIndex, students);
+        }
+
+        if (shouldRun(operations, BenchmarkOperation.GET)) {
+            StudentIndex getIndex = factory.create();
+            populateIndex(getIndex, students);
+            indexBenchmark.benchGet(getIndex, queryIds);
+        }
+
+        if (shouldRun(operations, BenchmarkOperation.REMOVE)) {
+            StudentIndex removeIndex = factory.create();
+            populateIndex(removeIndex, students);
+            indexBenchmark.benchRemove(removeIndex, removeIds);
+        }
     }
 
     private void runSelectedOperations(
