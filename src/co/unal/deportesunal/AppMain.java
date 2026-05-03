@@ -1,5 +1,6 @@
 package co.unal.deportesunal;
 
+import co.unal.deportesunal.benchmark.BenchmarkRunner;
 import co.unal.deportesunal.controller.AppController;
 import co.unal.deportesunal.persistence.StudentRepository;
 import co.unal.deportesunal.persistence.TxtStudentRepository;
@@ -18,7 +19,8 @@ public class AppMain {
         StudentRepository repo = new TxtStudentRepository();
         StudentService studentService= new StudentService(index, repo);
         AppController controller = new AppController(studentService);
-        ConsoleUi ui = new ConsoleUi(controller);
+        BenchmarkRunner benchmarkRunner = new BenchmarkRunner();
+        ConsoleUi ui = new ConsoleUi(controller, benchmarkRunner);
         ui.run();
     }
 }
