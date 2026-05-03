@@ -1,8 +1,16 @@
 package co.unal.deportesunal.ui;
 
+import co.unal.deportesunal.benchmark.BenchmarkConfig;
+import co.unal.deportesunal.benchmark.BenchmarkOperation;
+import co.unal.deportesunal.benchmark.BenchmarkRunner;
+import co.unal.deportesunal.benchmark.factories.AvlIndexFactory;
+import co.unal.deportesunal.benchmark.factories.BstIndexFactory;
+import co.unal.deportesunal.benchmark.factories.IndexFactory;
+import co.unal.deportesunal.benchmark.factories.ListIndexFactory;
 import co.unal.deportesunal.controller.AppController;
 import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.Student;
+import co.unal.deportesunal.persistence.FileConstant;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
 
@@ -11,10 +19,12 @@ import java.util.Scanner;
 public class ConsoleUi {
 
     private final AppController controller;
+    private final BenchmarkRunner benchmarkRunner;
     private final Scanner sc = new Scanner(System.in);
 
-    public ConsoleUi(AppController controller) {
+    public ConsoleUi(AppController controller, BenchmarkRunner benchmarkRunner) {
         this.controller = controller;
+        this.benchmarkRunner = benchmarkRunner;
     }
 
     private void autoLoadOnStart() {
@@ -216,9 +226,183 @@ public class ConsoleUi {
     }
 
     private void runBenchmarksFlow() {
-        // TODO: cuando tengas BenchmarkRunner listo:
-        // controller.runBenchmarks();
-        System.out.println("Benchmarks: pendiente de implementación (BenchmarkRunner).");
+        boolean back = false;
+
+        while (!back) {
+            printBenchmarkMenu();
+            int op = readInt("Opción: ");
+
+            try {
+                switch (op) {
+                    case 1 -> runBenchmark(
+                            BenchmarkConfig.defaultConfig(),
+                            allFactories(),
+                            allOperations(),
+                            false
+                    );
+
+                    case 2 -> runBenchmark(
+                            BenchmarkConfig.quickConfig(),
+                            allFactories(),
+                            allOperations(),
+                            false
+                    );
+
+                    case 3 -> runBenchmark(
+                            BenchmarkConfig.defaultConfig(),
+                            allFactories(),
+                            new BenchmarkOperation[]{BenchmarkOperation.PUT},
+                            false
+                    );
+
+                    case 4 -> runBenchmark(
+                            BenchmarkConfig.defaultConfig(),
+                            allFactories(),
+                            new BenchmarkOperation[]{BenchmarkOperation.GET},
+                            false
+                    );
+
+                    case 5 -> runBenchmark(
+                            BenchmarkConfig.defaultConfig(),
+                            allFactories(),
+                            new BenchmarkOperation[]{BenchmarkOperation.REMOVE},
+                            false
+                    );
+
+                    case 6 -> runBenchmarkByStructure();
+
+                    case 0 -> back = true;
+
+                    default -> System.out.println("Opción inválida.");
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR ejecutando benchmark: " + e.getMessage());
+            }
+        }
+    }
+
+    private void printBenchmarkMenu() {
+        System.out.println("\n--- Benchmarks ---");
+        System.out.println("1) Ejecutar TODOS los benchmarks (configuración completa)");
+        System.out.println("2) Ejecutar TODOS los benchmarks (configuración rápida)");
+        System.out.println("3) Ejecutar solo PUT");
+        System.out.println("4) Ejecutar solo GET");
+        System.out.println("5) Ejecutar solo REMOVE");
+        System.out.println("6) Ejecutar por estructura específica");
+        System.out.println("0) Volver");
+    }
+
+    private void runBenchmark(
+            BenchmarkConfig config,
+            IndexFactory[] factories,
+            BenchmarkOperation[] operations,
+            boolean append
+    ) throws Exception {
+        System.out.println("\nEjecutando benchmark...");
+        System.out.println("Resultados: " + FileConstant.INDEX_BENCHMARK_RESULTS);
+
+        benchmarkRunner.runOperations(config, factories, operations, append);
+
+        System.out.println("Benchmark terminado.");
+        System.out.println("CSV generado en: " + FileConstant.INDEX_BENCHMARK_RESULTS);
+    }
+
+    private void runBenchmarkByStructure() throws Exception {
+        System.out.println("\n--- Seleccionar estructura ---");
+        System.out.println("1) LIST");
+        System.out.println("2) BST");
+        System.out.println("3) AVL");
+        System.out.println("4) BST + AVL");
+        System.out.println("0) Cancelar");
+
+        int structureOption = readInt("Opción: ");
+
+        IndexFactory[] factories;
+
+        switch (structureOption) {
+            case 1 -> factories = new IndexFactory[]{new ListIndexFactory()};
+            case 2 -> factories = new IndexFactory[]{new BstIndexFactory()};
+            case 3 -> factories = new IndexFactory[]{new AvlIndexFactory()};
+            case 4 -> factories = new IndexFactory[]{new BstIndexFactory(), new AvlIndexFactory()};
+            case 0 -> {
+                System.out.println("Benchmark cancelado.");
+                return;
+            }
+            default -> {
+                System.out.println("Opción inválida.");
+                return;
+            }
+        }
+
+        BenchmarkOperation[] operations = chooseOperations();
+        if (operations == null) {
+            System.out.println("Benchmark cancelado.");
+            return;
+        }
+
+        BenchmarkConfig config = chooseBenchmarkConfig();
+
+        boolean append = askAppendResults();
+
+        runBenchmark(config, factories, operations, append);
+    }
+
+    private BenchmarkOperation[] chooseOperations() {
+        System.out.println("\n--- Seleccionar operación ---");
+        System.out.println("1) Todas");
+        System.out.println("2) Solo PUT");
+        System.out.println("3) Solo GET");
+        System.out.println("4) Solo REMOVE");
+        System.out.println("0) Cancelar");
+
+        int op = readInt("Opción: ");
+
+        return switch (op) {
+            case 1 -> allOperations();
+            case 2 -> new BenchmarkOperation[]{BenchmarkOperation.PUT};
+            case 3 -> new BenchmarkOperation[]{BenchmarkOperation.GET};
+            case 4 -> new BenchmarkOperation[]{BenchmarkOperation.REMOVE};
+            case 0 -> null;
+            default -> {
+                System.out.println("Opción inválida.");
+                yield null;
+            }
+        };
+    }
+
+    private BenchmarkConfig chooseBenchmarkConfig() {
+        System.out.println("\n--- Configuración ---");
+        System.out.println("1) Rápida");
+        System.out.println("2) Completa");
+        System.out.println("0) Rápida por defecto");
+
+        int op = readInt("Opción: ");
+
+        return switch (op) {
+            case 2 -> BenchmarkConfig.defaultConfig();
+            default -> BenchmarkConfig.quickConfig();
+        };
+    }
+
+    private boolean askAppendResults() {
+        String ans = readLine("¿Agregar al CSV existente? (s/n): ").trim().toLowerCase();
+        return ans.equals("s");
+    }
+
+    private IndexFactory[] allFactories() {
+        return new IndexFactory[]{
+                new ListIndexFactory(),
+                new BstIndexFactory(),
+                new AvlIndexFactory()
+        };
+    }
+
+    private BenchmarkOperation[] allOperations() {
+        return new BenchmarkOperation[]{
+                BenchmarkOperation.PUT,
+                BenchmarkOperation.GET,
+                BenchmarkOperation.REMOVE
+        };
     }
 
     // -------- Helpers de input/output --------
