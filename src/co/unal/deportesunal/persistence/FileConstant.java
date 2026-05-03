@@ -25,4 +25,11 @@ public class FileConstant {
 
     public static final String INDEX_BENCHMARK_RESULTS =
             RESULTS_DIR + File.separator + "index_benchmark.csv";
+
+    public static final String INDEX_BENCHMARK_FULL =
+            RESULTS_DIR + File.separator + "index_benchmark_full.csv";
+
+    public static String indexBenchmarkResult(String label) {
+        return RESULTS_DIR + File.separator + "index_benchmark_" + label + ".csv";
+    }
 }
