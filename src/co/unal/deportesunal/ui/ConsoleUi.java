@@ -8,6 +8,7 @@ import co.unal.deportesunal.benchmark.factories.BstIndexFactory;
 import co.unal.deportesunal.benchmark.factories.IndexFactory;
 import co.unal.deportesunal.benchmark.factories.ListIndexFactory;
 import co.unal.deportesunal.controller.AppController;
+import co.unal.deportesunal.domain.SportCount;
 import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.persistence.FileConstant;
@@ -49,9 +50,12 @@ public class ConsoleUi {
 
             switch (op) {
                 case 1 -> interactiveMenuLoop();
-                case 2 -> runBenchmarksFlow(); // placeholder
-                case 3 -> loadFlow();
-                case 4 -> saveFlow();
+                case 2 -> communityAnalysisFlow();
+                case 3 -> connectionAnalysisFlow();
+                case 4 -> statsAnalysisFlow();
+                case 5 -> runBenchmarksFlow();
+                case 6 -> loadFlow();
+                case 7 -> saveFlow();
                 case 0 -> exit = true;
                 default -> System.out.println("Opción inválida.");
             }
@@ -64,9 +68,12 @@ public class ConsoleUi {
     private void printMainMenu() {
         System.out.println("\n--- Menú principal ---");
         System.out.println("1) Modo interactivo (CRUD)");
-        System.out.println("2) Ejecutar benchmarks");
-        System.out.println("3) Recargar desde el archivo (sobreescribe el estado actual)");
-        System.out.println("4) Guardar a archivo");
+        System.out.println("2) Análisis de comunidades deportivas");
+        System.out.println("3) Análisis de conexiones");
+        System.out.println("4) Análisis de estadísticas");
+        System.out.println("5) Ejecutar benchmarks");
+        System.out.println("6) Recargar desde el archivo (sobreescribe el estado actual)");
+        System.out.println("7) Guardar a archivo");
         System.out.println("0) Salir");
     }
 
@@ -222,6 +229,287 @@ public class ConsoleUi {
             System.out.println("Datos guardados.");
         } catch (Exception e) {
             System.out.println("ERROR al guardar: " + e.getMessage());
+        }
+    }
+
+    private void communityAnalysisFlow() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n--- An\u00e1lisis de Comunidades ---");
+            System.out.println("1) Listar todas las comunidades");
+            System.out.println("2) Ver comunidad de un estudiante");
+            System.out.println("0) Volver");
+
+            int op = readInt("Opci\u00f3n: ");
+
+            switch (op) {
+                case 1 -> listAllCommunities();
+                case 2 -> viewStudentCommunity();
+                case 0 -> back = true;
+                default -> System.out.println("Opci\u00f3n inv\u00e1lida.");
+            }
+        }
+    }
+
+    private void listAllCommunities() {
+        try {
+            LinkedList<LinkedList<Student>> communities = controller.getCommunities();
+            int totalCommunities = controller.getTotalCommunities();
+            System.out.println("\nTotal de comunidades: " + totalCommunities);
+
+            final int[] communityNum = {1};
+            communities.traverse(new ListVisitor<LinkedList<Student>>() {
+                @Override
+                public void visit(LinkedList<Student> community) {
+                    if (community != null) {
+                        System.out.println("\nComunidad " + communityNum[0] + " (tama\u00f1o: " + community.size() + "):");
+                        community.traverse(new ListVisitor<Student>() {
+                            @Override
+                            public void visit(Student s) {
+                                if (s != null) {
+                                    System.out.println(
+                                            "  - " + s.getName() + " (ID=" + s.getId() + ") practica: "
+                                                    + joinSports(s.getPractice())
+                                    );
+                                }
+                            }
+                        });
+                        communityNum[0]++;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewStudentCommunity() {
+        try {
+            int id = readInt("ID del estudiante: ");
+            Student student = controller.findStudent(id);
+
+            LinkedList<Student> community = controller.getStudentCommunity(id);
+            int communitySize = community.size();
+
+            System.out.println("\n" + student.getName() + " (ID=" + id + ") est\u00e1 en una comunidad de " + communitySize + " miembros:");
+
+            community.traverse(new ListVisitor<Student>() {
+                @Override
+                public void visit(Student s) {
+                    if (s != null) {
+                        String marker = s.getId() == id ? " <-- (t\u00fa)" : "";
+                        System.out.println("  - " + s.getName() + " (ID=" + s.getId() + ")" + marker);
+                        System.out.println("    Practica: " + joinSports(s.getPractice()));
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void connectionAnalysisFlow() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n--- An\u00e1lisis de Conexiones ---");
+            System.out.println("1) Verificar conexi\u00f3n a un deporte");
+            System.out.println("2) Ver deportistas de un deporte en mi comunidad");
+            System.out.println("3) Ver todos los deportes en mi comunidad");
+            System.out.println("0) Volver");
+
+            int op = readInt("Opci\u00f3n: ");
+
+            switch (op) {
+                case 1 -> checkConnectionToSport();
+                case 2 -> viewPractitionersOfSport();
+                case 3 -> viewAllSportsInCommunity();
+                case 0 -> back = true;
+                default -> System.out.println("Opci\u00f3n inv\u00e1lida.");
+            }
+        }
+    }
+
+    private void checkConnectionToSport() {
+        try {
+            int id = readInt("Tu ID: ");
+            Student student = controller.findStudent(id);
+            SportEnum sport = readSportEnum();
+
+            boolean hasConnection = controller.hasConnectionToSport(id, sport);
+
+            if (hasConnection) {
+                System.out.println(
+                        "\n\u2713 S\u00cd, existe una conexi\u00f3n en tu comunidad a alguien que practica "
+                                + sport.displayName() + "!"
+                );
+                LinkedList<Student> practitioners = controller.getPractitionersInCommunity(id, sport);
+                System.out.println("Practicantes en tu comunidad (" + practitioners.size() + "):");
+                practitioners.traverse(new ListVisitor<Student>() {
+                    @Override
+                    public void visit(Student s) {
+                        if (s != null) {
+                            System.out.println("  - " + s.getName() + " (ID=" + s.getId() + ")");
+                        }
+                    }
+                });
+            } else {
+                System.out.println(
+                        "\n\u2717 No existe conexi\u00f3n en tu comunidad a alguien que practique "
+                                + sport.displayName()
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewPractitionersOfSport() {
+        try {
+            int id = readInt("Tu ID: ");
+            Student student = controller.findStudent(id);
+            SportEnum sport = readSportEnum();
+
+            LinkedList<Student> practitioners = controller.getPractitionersInCommunity(id, sport);
+            int count = controller.countPractitionersInCommunity(id, sport);
+
+            System.out.println("\nPracticantes de " + sport.displayName() + " en tu comunidad: " + count);
+            if (count > 0) {
+                practitioners.traverse(new ListVisitor<Student>() {
+                    @Override
+                    public void visit(Student s) {
+                        if (s != null) {
+                            System.out.println("  - " + s.getName() + " (ID=" + s.getId() + ")");
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewAllSportsInCommunity() {
+        try {
+            int id = readInt("Tu ID: ");
+            Student student = controller.findStudent(id);
+
+            LinkedList<SportEnum> sports = controller.getSportsInCommunity(id);
+            System.out.println("\nDeportes practicados en tu comunidad (" + sports.size() + "):");
+            sports.traverse(new ListVisitor<SportEnum>() {
+                @Override
+                public void visit(SportEnum sport) {
+                    if (sport != null) {
+                        int practitioners = controller.countPractitionersInCommunity(id, sport);
+                        System.out.println("  - " + sport.displayName() + " (" + practitioners + " practicantes)");
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void statsAnalysisFlow() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n--- Análisis de Estadísticas ---");
+            System.out.println("1) Ver ranking de deportes");
+            System.out.println("2) Ver deporte más practicado");
+            System.out.println("3) Ver deporte menos practicado");
+            System.out.println("4) Contar practicantes de un deporte");
+            System.out.println("5) Ver estadísticas generales");
+            System.out.println("0) Volver");
+
+            int op = readInt("Opción: ");
+
+            switch (op) {
+                case 1 -> viewRankingSports();
+                case 2 -> viewMostPracticedSport();
+                case 3 -> viewLeastPracticedSport();
+                case 4 -> countPractitionersOfSport();
+                case 5 -> viewGeneralStats();
+                case 0 -> back = true;
+                default -> System.out.println("Opción inválida.");
+            }
+        }
+    }
+
+    private void viewRankingSports() {
+        try {
+            LinkedList<SportCount> ranking = controller.getRankingSports();
+
+            if (ranking.size() == 0) {
+                System.out.println("\nNo hay deportes practicados aún.");
+                return;
+            }
+
+            System.out.println("\n=== Ranking de Deportes ===");
+            final int[] position = {1};
+            ranking.traverse(new ListVisitor<SportCount>() {
+                @Override
+                public void visit(SportCount sc) {
+                    if (sc != null) {
+                        System.out.println(
+                                position[0] + ". " + sc.getSport().displayName()
+                                        + " (" + sc.getCount() + " practicantes)"
+                        );
+                        position[0]++;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewMostPracticedSport() {
+        try {
+            SportCount top = controller.getMostPracticedSport();
+            if (top != null) {
+                System.out.println(
+                        "\n🏆 Deporte más practicado: " + top.getSport().displayName()
+                                + " (" + top.getCount() + " estudiantes)"
+                );
+            } else {
+                System.out.println("\nNo hay deportes practicados aún.");
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewLeastPracticedSport() {
+        try {
+            SportCount least = controller.getLeastPracticedSport();
+            if (least != null) {
+                System.out.println(
+                        "\n📊 Deporte menos practicado: " + least.getSport().displayName()
+                                + " (" + least.getCount() + " estudiantes)"
+                );
+            } else {
+                System.out.println("\nNo hay deportes practicados aún.");
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void countPractitionersOfSport() {
+        try {
+            SportEnum sport = readSportEnum();
+            int count = controller.getPractitionersCount(sport);
+            System.out.println("\nPracticantes de " + sport.displayName() + ": " + count);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
+    }
+
+    private void viewGeneralStats() {
+        try {
+            String stats = controller.getGeneralStats();
+            System.out.println("\n" + stats);
+        } catch (Exception e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
     }
 
