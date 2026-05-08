@@ -6,15 +6,13 @@ import co.unal.deportesunal.persistence.StudentRepository;
 import co.unal.deportesunal.persistence.TxtStudentRepository;
 import co.unal.deportesunal.service.StudentService;
 import co.unal.deportesunal.structure.index.AvlIndex;
-import co.unal.deportesunal.structure.index.BstIndex;
-import co.unal.deportesunal.structure.index.ListStudentIndex;
 import co.unal.deportesunal.structure.index.StudentIndex;
 import co.unal.deportesunal.ui.ConsoleUi;
 
 public class AppMain {
     public static void main(String[] args) {
-        StudentIndex index = new BstIndex();
-        //StudentIndex index = new AvlIndex();
+        //StudentIndex index = new BstIndex();
+        StudentIndex index = new AvlIndex();
         //StudentIndex index = new ListStudentIndex();
         StudentRepository repo = new TxtStudentRepository();
         StudentService studentService= new StudentService(index, repo);

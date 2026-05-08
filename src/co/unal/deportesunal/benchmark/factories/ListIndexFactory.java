@@ -1,6 +1,6 @@
 package co.unal.deportesunal.benchmark.factories;
 
-import co.unal.deportesunal.structure.index.ListStudentIndex;
+import co.unal.deportesunal.structure.index.ListIndex;
 import co.unal.deportesunal.structure.index.StudentIndex;
 
 public class ListIndexFactory implements IndexFactory {
@@ -11,6 +11,6 @@ public class ListIndexFactory implements IndexFactory {
 
     @Override
     public StudentIndex create() {
-        return new ListStudentIndex();
+        return new ListIndex();
     }
 }
