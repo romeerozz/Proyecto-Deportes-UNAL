@@ -7,7 +7,7 @@ import co.unal.deportesunal.persistence.FileConstant;
 import co.unal.deportesunal.persistence.TxtStudentRepository;
 import co.unal.deportesunal.service.StudentService;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
-import co.unal.deportesunal.structure.index.ListStudentIndex;
+import co.unal.deportesunal.structure.index.ListIndex;
 import co.unal.deportesunal.structure.index.StudentIndex;
 
 import java.io.BufferedReader;
@@ -18,7 +18,7 @@ public class StudentServiceSmokeTest {
 
     public static void main(String[] args) throws Exception {
 
-        StudentIndex index = new ListStudentIndex();
+        StudentIndex index = new ListIndex();
         TxtStudentRepository repo = new TxtStudentRepository();
         StudentService service = new StudentService(index, repo);
 
@@ -62,7 +62,7 @@ public class StudentServiceSmokeTest {
         printStudentsTxt();
 
         // 6) Cargar en otro índice (round-trip)
-        StudentIndex index2 = new ListStudentIndex();
+        StudentIndex index2 = new ListIndex();
         StudentService service2 = new StudentService(index2, repo);
         service2.loadFromRepository();
 
