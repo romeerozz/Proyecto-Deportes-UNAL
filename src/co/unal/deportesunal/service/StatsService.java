@@ -5,6 +5,8 @@ import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
+import co.unal.deportesunal.structure.heap.Comparator;
+import co.unal.deportesunal.structure.heap.MaxHeap;
 
 	/**
 	 * StatsService proporciona estadísticas sobre los deportes practicados.
@@ -78,51 +80,27 @@ import co.unal.deportesunal.structure.listadt.ListVisitor;
 				}
 			});
 
-			// Ordenar manualmente usando burbuja (simple pero correcto)
-			return bubbleSortDescending(filtered);
+			// Ordenar usando montículo (heap) para obtener ranking descendente
+			Comparator<SportCount> comp = new Comparator<SportCount>() {
+				@Override
+				public int compare(SportCount a, SportCount b) {
+					return Integer.compare(a.getCount(), b.getCount());
+				}
+			};
+
+			MaxHeap<SportCount> heap = MaxHeap.fromList(filtered, comp);
+			LinkedList<SportCount> result = new LinkedList<>();
+			SportCount sc;
+			while ((sc = heap.pop()) != null) {
+				result.pushBack(sc);
+			}
+			return result;
 		}
 
 		/**
 		 * Ordena SportCount en orden descendente por cantidad de practicantes.
 		 */
-		private LinkedList<SportCount> bubbleSortDescending(LinkedList<SportCount> list) {
-			if (list.size() <= 1) return list;
-
-			LinkedList<SportCount> result = new LinkedList<>();
-
-			// Copiar elementos a array para ordenar
-			final SportCount[] arr = new SportCount[list.size()];
-			final int[] idx = {0};
-
-			list.traverse(new ListVisitor<SportCount>() {
-				@Override
-				public void visit(SportCount sc) {
-					if (sc != null) {
-						arr[idx[0]++] = sc;
-					}
-				}
-			});
-
-			// Burbuja
-			for (int i = 0; i < arr.length - 1; i++) {
-				for (int j = 0; j < arr.length - 1 - i; j++) {
-					if (arr[j].getCount() < arr[j + 1].getCount()) {
-						SportCount temp = arr[j];
-						arr[j] = arr[j + 1];
-						arr[j + 1] = temp;
-					}
-				}
-			}
-
-			// Pasar a LinkedList
-			for (SportCount sc : arr) {
-				if (sc != null) {
-					result.pushBack(sc);
-				}
-			}
-
-			return result;
-		}
+		// bubble sort removed; heap-based approach used instead
 
 		/**
 		 * Obtiene el deporte más practicado.
