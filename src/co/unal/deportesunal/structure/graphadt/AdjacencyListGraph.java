@@ -7,6 +7,10 @@ import co.unal.deportesunal.structure.queue.ArrayQueue;
 /** Simple undirected adjacency-list graph implementation. Vertices are generic values. */
 public class AdjacencyListGraph<T> implements Graph<T> {
 
+    private static final class ListHolder<E> {
+        private LinkedList<E> value;
+    }
+
     private final LinkedList<T> vertices;
     private final LinkedList<LinkedList<T>> adjLists;
 
@@ -42,16 +46,16 @@ public class AdjacencyListGraph<T> implements Graph<T> {
     }
 
     private LinkedList<T> getAdjListAtIndex(int idx) {
-        final LinkedList<T>[] out = new LinkedList[1];
+        final ListHolder<T> out = new ListHolder<>();
         final int[] i = {0};
         adjLists.traverse(new ListVisitor<LinkedList<T>>() {
             @Override
             public void visit(LinkedList<T> value) {
-                if (i[0] == idx) out[0] = value;
+                if (i[0] == idx) out.value = value;
                 i[0]++;
             }
         });
-        return out[0];
+        return out.value;
     }
 
     public void addEdge(T a, T b) {
@@ -64,6 +68,27 @@ public class AdjacencyListGraph<T> implements Graph<T> {
         LinkedList<T> lb = getAdjListAtIndex(ib);
         if (!la.contains(b)) la.pushBack(b);
         if (!lb.contains(a)) lb.pushBack(a);
+    }
+
+    public boolean removeVertex(T v) {
+        int idx = indexOf(v);
+        if (idx == -1) return false;
+
+        LinkedList<T> targetAdj = getAdjListAtIndex(idx);
+        if (targetAdj != null) {
+            adjLists.remove(targetAdj);
+        }
+
+        vertices.remove(v);
+
+        adjLists.traverse(new ListVisitor<LinkedList<T>>() {
+            @Override
+            public void visit(LinkedList<T> neighbors) {
+                neighbors.remove(v);
+            }
+        });
+
+        return true;
     }
 
     public LinkedList<T> neighbors(T v) {

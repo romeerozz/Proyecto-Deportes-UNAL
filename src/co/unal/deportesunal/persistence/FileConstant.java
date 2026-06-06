@@ -32,4 +32,14 @@ public class FileConstant {
     public static String indexBenchmarkResult(String label) {
         return RESULTS_DIR + File.separator + "index_benchmark_" + label + ".csv";
     }
+
+        public static final String GRAPH_BENCHMARK_RESULTS =
+                        RESULTS_DIR + File.separator + "graph_benchmark.csv";
+
+        public static final String GRAPH_BENCHMARK_FULL =
+                        RESULTS_DIR + File.separator + "graph_benchmark_full.csv";
+
+        public static String graphBenchmarkResult(String label) {
+                return RESULTS_DIR + File.separator + "graph_benchmark_" + label + ".csv";
+        }
 }
