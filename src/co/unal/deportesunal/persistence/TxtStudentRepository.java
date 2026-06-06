@@ -4,26 +4,39 @@ import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.exception.DataAccessException;
 import co.unal.deportesunal.structure.listadt.LinkedList;
+import co.unal.deportesunal.structure.listadt.ListVisitor;
 
 import java.io.*;
 
 public class TxtStudentRepository implements StudentRepository {
 
-    private final File fileLocation = new File(FileConstant.STUDENTS_FILE);
+    private final File fileLocation;
 
     public TxtStudentRepository() throws DataAccessException {
+        this(FileConstant.STUDENTS_FILE);
+    }
+
+    public TxtStudentRepository(String filePath) throws DataAccessException {
+        this.fileLocation = new File(filePath);
+        initializeFile();
+    }
+
+    private void initializeFile() throws DataAccessException {
         try {
             File parentDir = fileLocation.getParentFile();
+
             if (parentDir != null && !parentDir.exists()) {
                 if (!parentDir.mkdirs()) {
                     throw new DataAccessException("There was an error creating the file directory");
                 }
             }
+
             if (!fileLocation.exists()) {
                 if (!fileLocation.createNewFile()) {
                     throw new DataAccessException("There was an error creating the file");
                 }
             }
+
         } catch (IOException e) {
             throw new DataAccessException("There was an error initializing students file", e);
         }
@@ -59,11 +72,24 @@ public class TxtStudentRepository implements StudentRepository {
             bw.write("# id;name;PRACTICE(comma);INTEREST(comma)");
             bw.newLine();
 
-            // TODO: Depende de cómo se implemente la iteración en LinkedList:
-            //  - Opción A: students.get(i)
-            //  - Opción B: students.forEach(Visitor<Student>)
-            //  - Opción C: Iterator (Iterable)
+            students.traverse(new ListVisitor<Student>() {
+                @Override
+                public void visit(Student s) {
+                    try {
+                        bw.write(serializeStudent(s));
+                        bw.newLine();
+                    } catch (IOException e) {
+                        // No podemos lanzar checked exception desde aquí, así que envolvemos
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
 
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof IOException) {
+                throw new DataAccessException("There was an error writing the file", e.getCause());
+            }
+            throw e;
         } catch (IOException e) {
             throw new DataAccessException("There was an error writing the file", e);
         }
@@ -113,7 +139,6 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String serializeStudent(Student s) {
-        // TODO: Ajustar según la firma final de Student (getId() vs getID()).
         return s.getId() + ";" +
                 escapeName(s.getName()) + ";" +
                 joinSports(s, true) + ";" +
@@ -121,13 +146,23 @@ public class TxtStudentRepository implements StudentRepository {
     }
 
     private String escapeName(String name) {
-        // Evita ';' en nombres para no romper el formato
         return name == null ? "" : name.replace(";", " ");
     }
 
     private String joinSports(Student s, boolean practice) {
-        // TODO: Esto depende de cómo se exponga/itere la lista de deportes en Student y LinkedList.
+        final StringBuilder sb = new StringBuilder();
 
-        return "";
+        LinkedList<SportEnum> list = practice ? s.getPractice() : s.getInterest();
+
+        list.traverse(new ListVisitor<SportEnum>() {
+            @Override
+            public void visit(SportEnum sport) {
+                if (sport == null) return;
+                if (sb.length() > 0) sb.append(",");
+                sb.append(sport.name());
+            }
+        });
+
+        return sb.toString();
     }
 }

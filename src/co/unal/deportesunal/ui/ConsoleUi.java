@@ -267,8 +267,10 @@ public class ConsoleUi {
                             @Override
                             public void visit(Student s) {
                                 if (s != null) {
-                                    System.out.println("  - " + s.getName() + " (ID=" + s.getId() + ") practica: " 
-                                        + joinSports(s.getPractice()));
+                                    System.out.println(
+                                            "  - " + s.getName() + " (ID=" + s.getId() + ") practica: "
+                                                    + joinSports(s.getPractice())
+                                    );
                                 }
                             }
                         });
@@ -285,12 +287,12 @@ public class ConsoleUi {
         try {
             int id = readInt("ID del estudiante: ");
             Student student = controller.findStudent(id);
-            
+
             LinkedList<Student> community = controller.getStudentCommunity(id);
             int communitySize = community.size();
-            
+
             System.out.println("\n" + student.getName() + " (ID=" + id + ") est\u00e1 en una comunidad de " + communitySize + " miembros:");
-            
+
             community.traverse(new ListVisitor<Student>() {
                 @Override
                 public void visit(Student s) {
@@ -332,12 +334,14 @@ public class ConsoleUi {
             int id = readInt("Tu ID: ");
             Student student = controller.findStudent(id);
             SportEnum sport = readSportEnum();
-            
+
             boolean hasConnection = controller.hasConnectionToSport(id, sport);
-            
+
             if (hasConnection) {
-                System.out.println("\n\u2713 S\u00cd, existe una conexi\u00f3n en tu comunidad a alguien que practica " 
-                    + sport.displayName() + "!");
+                System.out.println(
+                        "\n\u2713 S\u00cd, existe una conexi\u00f3n en tu comunidad a alguien que practica "
+                                + sport.displayName() + "!"
+                );
                 LinkedList<Student> practitioners = controller.getPractitionersInCommunity(id, sport);
                 System.out.println("Practicantes en tu comunidad (" + practitioners.size() + "):");
                 practitioners.traverse(new ListVisitor<Student>() {
@@ -349,8 +353,10 @@ public class ConsoleUi {
                     }
                 });
             } else {
-                System.out.println("\n\u2717 No existe conexi\u00f3n en tu comunidad a alguien que practique " 
-                    + sport.displayName());
+                System.out.println(
+                        "\n\u2717 No existe conexi\u00f3n en tu comunidad a alguien que practique "
+                                + sport.displayName()
+                );
             }
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -362,10 +368,10 @@ public class ConsoleUi {
             int id = readInt("Tu ID: ");
             Student student = controller.findStudent(id);
             SportEnum sport = readSportEnum();
-            
+
             LinkedList<Student> practitioners = controller.getPractitionersInCommunity(id, sport);
             int count = controller.countPractitionersInCommunity(id, sport);
-            
+
             System.out.println("\nPracticantes de " + sport.displayName() + " en tu comunidad: " + count);
             if (count > 0) {
                 practitioners.traverse(new ListVisitor<Student>() {
@@ -386,7 +392,7 @@ public class ConsoleUi {
         try {
             int id = readInt("Tu ID: ");
             Student student = controller.findStudent(id);
-            
+
             LinkedList<SportEnum> sports = controller.getSportsInCommunity(id);
             System.out.println("\nDeportes practicados en tu comunidad (" + sports.size() + "):");
             sports.traverse(new ListVisitor<SportEnum>() {
@@ -431,7 +437,7 @@ public class ConsoleUi {
     private void viewRankingSports() {
         try {
             LinkedList<SportCount> ranking = controller.getRankingSports();
-            
+
             if (ranking.size() == 0) {
                 System.out.println("\nNo hay deportes practicados aún.");
                 return;
@@ -443,8 +449,10 @@ public class ConsoleUi {
                 @Override
                 public void visit(SportCount sc) {
                     if (sc != null) {
-                        System.out.println(position[0] + ". " + sc.getSport().displayName() 
-                            + " (" + sc.getCount() + " practicantes)");
+                        System.out.println(
+                                position[0] + ". " + sc.getSport().displayName()
+                                        + " (" + sc.getCount() + " practicantes)"
+                        );
                         position[0]++;
                     }
                 }
@@ -458,8 +466,10 @@ public class ConsoleUi {
         try {
             SportCount top = controller.getMostPracticedSport();
             if (top != null) {
-                System.out.println("\n🏆 Deporte más practicado: " + top.getSport().displayName() 
-                    + " (" + top.getCount() + " estudiantes)");
+                System.out.println(
+                        "\n🏆 Deporte más practicado: " + top.getSport().displayName()
+                                + " (" + top.getCount() + " estudiantes)"
+                );
             } else {
                 System.out.println("\nNo hay deportes practicados aún.");
             }
@@ -472,8 +482,10 @@ public class ConsoleUi {
         try {
             SportCount least = controller.getLeastPracticedSport();
             if (least != null) {
-                System.out.println("\n📊 Deporte menos practicado: " + least.getSport().displayName() 
-                    + " (" + least.getCount() + " estudiantes)");
+                System.out.println(
+                        "\n📊 Deporte menos practicado: " + least.getSport().displayName()
+                                + " (" + least.getCount() + " estudiantes)"
+                );
             } else {
                 System.out.println("\nNo hay deportes practicados aún.");
             }
