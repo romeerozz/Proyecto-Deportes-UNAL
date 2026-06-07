@@ -78,27 +78,8 @@ import co.unal.deportesunal.structure.heap.MaxHeapSportCount;
 					}
 				}
 			});
-
-			// Construir heap
-    	MaxHeapSportCount heap = new MaxHeapSportCount();
-
-    		filtered.traverse(new ListVisitor<SportCount>() {
-        	@Override
-        	public void visit(SportCount sc) {
-            	if (sc != null) {
-                	heap.insert(sc);
-            }
-        }
-    });
-
-    // Extraer ordenados de mayor a menor
-    	LinkedList<SportCount> ranking = new LinkedList<>();
-
-    	while (!heap.isEmpty()) {
-        ranking.pushBack(heap.extractMax());
-    }
-
-    return ranking;
+			
+    return bubbleSortDescending(filtered);
 }
 
 
