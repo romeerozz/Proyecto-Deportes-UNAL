@@ -10,6 +10,10 @@ import co.unal.deportesunal.persistence.FileConstant;
 import co.unal.deportesunal.structure.graphadt.AdjacencyListGraph;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
+import co.unal.deportesunal.domain.SportEnum;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +53,6 @@ public class GraphBenchmarkRunner {
             String outputPath,
             boolean append
     ) throws IOException, DataAccessException {
-
         validateConfig(config);
         validateOperations(operations);
         validateOutputPath(outputPath);
@@ -140,6 +143,7 @@ public class GraphBenchmarkRunner {
     }
 
     private void populateGraph(AdjacencyListGraph<Integer> graph, LinkedList<Student> students) {
+        // Agregar vértices
         students.traverse(new ListVisitor<Student>() {
             @Override
             public void visit(Student student) {
@@ -149,19 +153,41 @@ public class GraphBenchmarkRunner {
             }
         });
 
+        // Bucket por deporte practicado: deporte -> lista de IDs
+        Map<SportEnum, ArrayList<Integer>> buckets = new EnumMap<>(SportEnum.class);
+        for (SportEnum sp : SportEnum.values()) {
+            buckets.put(sp, new ArrayList<>());
+        }
+
         students.traverse(new ListVisitor<Student>() {
             @Override
-            public void visit(Student s1) {
-                students.traverse(new ListVisitor<Student>() {
+            public void visit(Student s) {
+                if (s == null) return;
+                s.getPractice().traverse(new ListVisitor<SportEnum>() {
                     @Override
-                    public void visit(Student s2) {
-                        if (s1 != null && s2 != null && s1.getId() < s2.getId() && s1.sharesPracticeWith(s2)) {
-                            graph.addEdge(s1.getId(), s2.getId());
-                        }
+                    public void visit(SportEnum sport) {
+                        if (sport == null) return;
+                        ArrayList<Integer> list = buckets.get(sport);
+                        if (list != null) list.add(s.getId());
                     }
                 });
             }
         });
+
+        // Conectar pares solo dentro de cada bucket (i<j)
+        for (SportEnum sp : SportEnum.values()) {
+            ArrayList<Integer> ids = buckets.get(sp);
+            if (ids == null || ids.size() < 2) continue;
+            int m = ids.size();
+            for (int i = 0; i < m; i++) {
+                if (Thread.currentThread().isInterrupted()) return;
+                int id1 = ids.get(i);
+                for (int j = i + 1; j < m; j++) {
+                    int id2 = ids.get(j);
+                    graph.addEdge(id1, id2);
+                }
+            }
+        }
     }
 
     private void validateConfig(BenchmarkConfig config) {
