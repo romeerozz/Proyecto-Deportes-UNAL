@@ -1,6 +1,7 @@
 package co.unal.deportesunal.benchmark;
 
 import co.unal.deportesunal.benchmark.factories.IndexFactory;
+import co.unal.deportesunal.benchmark.GraphBenchmarkRunner;
 import co.unal.deportesunal.benchmark.utils.CsvWriter;
 import co.unal.deportesunal.benchmark.utils.MockDataGenerator;
 import co.unal.deportesunal.benchmark.utils.SimpleCsvWriter;
@@ -20,10 +21,12 @@ public class BenchmarkRunner {
 
     private final MockDataGenerator generator;
     private final IndexBenchmark indexBenchmark;
+    private final GraphBenchmarkRunner graphBenchmark;
 
     public BenchmarkRunner() {
         this.generator = new MockDataGenerator();
         this.indexBenchmark = new IndexBenchmark();
+        this.graphBenchmark = new GraphBenchmarkRunner();
     }
 
     public BenchmarkRunner(MockDataGenerator generator, IndexBenchmark indexBenchmark) {
@@ -36,6 +39,7 @@ public class BenchmarkRunner {
 
         this.generator = generator;
         this.indexBenchmark = indexBenchmark;
+        this.graphBenchmark = new GraphBenchmarkRunner();
     }
 
     public void runAll(BenchmarkConfig config, IndexFactory[] factories)
@@ -52,6 +56,13 @@ public class BenchmarkRunner {
                 FileConstant.INDEX_BENCHMARK_FULL,
                 false
         );
+
+        // Ejecutar también los benchmarks de grafo para la misma configuración
+        try {
+            graphBenchmark.runAll(config);
+        } catch (Exception e) {
+            System.out.println("Warning: graph benchmark failed during runAll: " + e.getMessage());
+        }
     }
 
     public void runOperations(
@@ -102,6 +113,10 @@ public class BenchmarkRunner {
                 System.out.println("\n=== Benchmark n=" + n + " ===");
 
                 for (int trial = 1; trial <= config.trials; trial++) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        System.out.println("Index benchmark cancelled.");
+                        return;
+                    }
                     long trialSeed = config.seed + (trial - 1);
 
                     System.out.println("Generando datos: n=" + n + ", trial=" + trial + ", seed=" + trialSeed);
@@ -133,6 +148,10 @@ public class BenchmarkRunner {
                     }
 
                     for (IndexFactory factory : factories) {
+                        if (Thread.currentThread().isInterrupted()) {
+                            System.out.println("Index benchmark cancelled.");
+                            return;
+                        }
                         runSelectedOperations(
                                 writer,
                                 factory,
