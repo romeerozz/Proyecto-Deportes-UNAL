@@ -5,6 +5,7 @@ import co.unal.deportesunal.domain.SportEnum;
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
+import co.unal.deportesunal.structure.heap.MaxHeapSportCount;
 
 	/**
 	 * StatsService proporciona estadísticas sobre los deportes practicados.
@@ -78,9 +79,28 @@ import co.unal.deportesunal.structure.listadt.ListVisitor;
 				}
 			});
 
-			// Ordenar manualmente usando burbuja (simple pero correcto)
-			return bubbleSortDescending(filtered);
-		}
+			// Construir heap
+    	MaxHeapSportCount heap = new MaxHeapSportCount();
+
+    		filtered.traverse(new ListVisitor<SportCount>() {
+        	@Override
+        	public void visit(SportCount sc) {
+            	if (sc != null) {
+                	heap.insert(sc);
+            }
+        }
+    });
+
+    // Extraer ordenados de mayor a menor
+    	LinkedList<SportCount> ranking = new LinkedList<>();
+
+    	while (!heap.isEmpty()) {
+        ranking.pushBack(heap.extractMax());
+    }
+
+    return ranking;
+}
+
 
 		/**
 		 * Ordena SportCount en orden descendente por cantidad de practicantes.
