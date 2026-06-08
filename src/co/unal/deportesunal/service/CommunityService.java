@@ -19,27 +19,80 @@ public class CommunityService {
         this.studentService = studentService;
     }
 
-    /**
-     * Encuentra todas las comunidades deportivas.
-     * @return LinkedList de LinkedList<Student>, donde cada LinkedList es una comunidad.
-     */
+    
     public LinkedList<LinkedList<Student>> findCommunities() {
-        LinkedList<LinkedList<Student>> communities = new LinkedList<>();
-        LinkedList<Student> allStudents = studentService.listStudentsOrderedById();
-        LinkedList<Integer> visited = new LinkedList<>();
 
-        allStudents.traverse(new ListVisitor<Student>() {
-            @Override
-            public void visit(Student student) {
-                if (student != null && !isVisited(visited, student.getId())) {
-                    LinkedList<Student> community = bfsGetCommunity(student, visited);
-                    communities.pushBack(community);
-                }
+    LinkedList<LinkedList<Student>> communities = new LinkedList<>();
+
+    LinkedList<Student> students =
+            studentService.listStudentsOrderedById();
+
+    UnionFind uf = new UnionFind();
+
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student s) {
+            if (s != null) {
+                uf.makeSet(s.getId());
             }
-        });
+        }
+    });
 
-        return communities;
-    }
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student s1) {
+
+            students.traverse(new ListVisitor<Student>() {
+                @Override
+                public void visit(Student s2) {
+
+                    if (s1 != null
+                            && s2 != null
+                            && s1.getId() < s2.getId()
+                            && s1.sharesPracticeWith(s2)) {
+
+                        uf.union(
+                                s1.getId(),
+                                s2.getId()
+                        );
+                    }
+                }
+            });
+        }
+    });
+
+    LinkedList<Integer> processedRoots = new LinkedList<>();
+
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student student) {
+
+            int root = uf.find(student.getId());
+
+            if (!processedRoots.contains(root)) {
+
+                processedRoots.pushBack(root);
+
+                LinkedList<Student> community =
+                        new LinkedList<>();
+
+                students.traverse(new ListVisitor<Student>() {
+                    @Override
+                    public void visit(Student other) {
+
+                        if (uf.find(other.getId()) == root) {
+                            community.pushBack(other);
+                        }
+                    }
+                });
+
+                communities.pushBack(community);
+            }
+        }
+    });
+
+    return communities;
+}
 
     /**
      * Retorna la comunidad a la que pertenece un estudiante específico.
