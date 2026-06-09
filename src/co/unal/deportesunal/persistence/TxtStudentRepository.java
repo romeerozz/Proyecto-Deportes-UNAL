@@ -10,27 +10,36 @@ import java.io.*;
 
 public class TxtStudentRepository implements StudentRepository {
 
-    private final File fileLocation = new File(FileConstant.STUDENTS_FILE);
+    private final File fileLocation;
 
     public TxtStudentRepository() throws DataAccessException {
+        this(FileConstant.STUDENTS_FILE);
+    }
+
+    public TxtStudentRepository(String filePath) throws DataAccessException {
+        this.fileLocation = new File(filePath);
+        initializeFile();
+    }
+
+    private void initializeFile() throws DataAccessException {
         try {
             File parentDir = fileLocation.getParentFile();
+
             if (parentDir != null && !parentDir.exists()) {
                 if (!parentDir.mkdirs()) {
                     throw new DataAccessException("There was an error creating the file directory");
                 }
             }
+
             if (!fileLocation.exists()) {
                 if (!fileLocation.createNewFile()) {
                     throw new DataAccessException("There was an error creating the file");
                 }
             }
+
         } catch (IOException e) {
             throw new DataAccessException("There was an error initializing students file", e);
         }
-        System.out.println("user.dir = " + System.getProperty("user.dir"));
-        System.out.println("students abs = " + fileLocation.getAbsolutePath());
-        System.out.println("exists=" + fileLocation.exists() + ", length=" + fileLocation.length());
     }
 
     @Override

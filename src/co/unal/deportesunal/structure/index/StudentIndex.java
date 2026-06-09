@@ -1,4 +1,4 @@
-package co.unal.deportesunal.structure.tree;
+package co.unal.deportesunal.structure.index;
 
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.domain.exception.DuplicatedIdException;

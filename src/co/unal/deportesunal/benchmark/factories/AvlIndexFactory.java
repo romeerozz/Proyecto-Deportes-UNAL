@@ -1,7 +1,7 @@
 package co.unal.deportesunal.benchmark.factories;
 
-import co.unal.deportesunal.structure.tree.AvlIndex;
-import co.unal.deportesunal.structure.tree.StudentIndex;
+import co.unal.deportesunal.structure.index.AvlIndex;
+import co.unal.deportesunal.structure.index.StudentIndex;
 
 public class AvlIndexFactory implements IndexFactory {
     @Override

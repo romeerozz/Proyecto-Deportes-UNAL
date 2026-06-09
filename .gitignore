@@ -4,6 +4,15 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+# Mock data generated for benchmarks
+data/mock/*.txt
+!data/mock/.gitkeep
+
+# Benchmark result folders
+data/results/raw/
+data/results/*.tmp
+!data/results/.gitkeep
+
 ### Eclipse ###
 .apt_generated
 .classpath

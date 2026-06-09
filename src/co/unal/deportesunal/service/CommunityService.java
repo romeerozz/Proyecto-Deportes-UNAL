@@ -3,6 +3,7 @@ package co.unal.deportesunal.service;
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
+import co.unal.deportesunal.structure.graphadt.AdjacencyListGraph;
 import co.unal.deportesunal.structure.queue.ArrayQueue;
 import co.unal.deportesunal.structure.queue.Queue;
 
@@ -101,9 +102,16 @@ public class CommunityService {
      */
     public LinkedList<Student> findCommunityById(int studentId) {
         try {
-            Student student = studentService.findStudentById(studentId);
-            LinkedList<Integer> visited = new LinkedList<>();
-            return bfsGetCommunity(student, visited);
+            AdjacencyListGraph<Integer> graph = buildGraphFromStudents();
+            LinkedList<Integer> compIds = graph.bfsComponent(studentId);
+            LinkedList<Student> community = new LinkedList<>();
+            compIds.traverse(new ListVisitor<Integer>() {
+                @Override
+                public void visit(Integer id) {
+                    try { community.pushBack(studentService.findStudentById(id)); } catch (Exception e) {}
+                }
+            });
+            return community;
         } catch (Exception e) {
             return new LinkedList<>();
         }
@@ -131,10 +139,10 @@ public class CommunityService {
             allStudents.traverse(new ListVisitor<Student>() {
                 @Override
                 public void visit(Student neighbor) {
-                    if (neighbor != null 
+                    if (neighbor != null
                         && !isVisited(visited, neighbor.getId())
                         && current.sharesPracticeWith(neighbor)) {
-                        
+
                         visited.pushBack(neighbor.getId());
                         community.pushBack(neighbor);
                         queue.enqueue(neighbor);
@@ -163,6 +171,38 @@ public class CommunityService {
             }
         });
         return found[0];
+    }
+
+    /** Construye un grafo no dirigido donde los vértices son IDs de estudiantes y
+     * hay una arista entre dos IDs si comparten al menos un deporte practicado. */
+    private AdjacencyListGraph<Integer> buildGraphFromStudents() {
+        AdjacencyListGraph<Integer> graph = new AdjacencyListGraph<>();
+        LinkedList<Student> students = studentService.listStudentsOrderedById();
+
+        // Añadir vértices
+        students.traverse(new ListVisitor<Student>() {
+            @Override
+            public void visit(Student s) {
+                if (s != null) graph.addVertex(s.getId());
+            }
+        });
+
+        // Añadir aristas entre pares que comparten práctica
+        students.traverse(new ListVisitor<Student>() {
+            @Override
+            public void visit(Student s1) {
+                students.traverse(new ListVisitor<Student>() {
+                    @Override
+                    public void visit(Student s2) {
+                        if (s1 != null && s2 != null && s1.getId() < s2.getId() && s1.sharesPracticeWith(s2)) {
+                            graph.addEdge(s1.getId(), s2.getId());
+                        }
+                    }
+                });
+            }
+        });
+
+        return graph;
     }
 
     /**

@@ -1,4 +1,4 @@
-package co.unal.deportesunal.structure.tree;
+package co.unal.deportesunal.structure.index;
 
 import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.domain.exception.DuplicatedIdException;
@@ -6,7 +6,7 @@ import co.unal.deportesunal.domain.exception.NotFoundException;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
 
-public class ListStudentIndex implements StudentIndex {
+public class ListIndex implements StudentIndex {
 
     private final LinkedList<Student> data = new LinkedList<>();
 

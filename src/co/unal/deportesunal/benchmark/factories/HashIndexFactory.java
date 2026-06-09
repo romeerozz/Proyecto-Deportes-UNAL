@@ -1,16 +1,16 @@
 package co.unal.deportesunal.benchmark.factories;
 
-import co.unal.deportesunal.structure.index.BstIndex;
+import co.unal.deportesunal.structure.index.HashStudentIndex;
 import co.unal.deportesunal.structure.index.StudentIndex;
 
-public class BstIndexFactory implements IndexFactory {
+public class HashIndexFactory implements IndexFactory {
     @Override
     public String name() {
-        return "BST";
+        return "HASH";
     }
 
     @Override
     public StudentIndex create() {
-        return new BstIndex();
+        return new HashStudentIndex();
     }
 }
