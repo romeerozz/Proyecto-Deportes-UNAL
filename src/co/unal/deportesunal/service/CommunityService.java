@@ -20,33 +20,80 @@ public class CommunityService {
         this.studentService = studentService;
     }
 
-    /**
-     * Encuentra todas las comunidades deportivas.
-     * @return LinkedList de LinkedList<Student>, donde cada LinkedList es una comunidad.
-     */
+    
     public LinkedList<LinkedList<Student>> findCommunities() {
-        LinkedList<LinkedList<Student>> communities = new LinkedList<>();
-        AdjacencyListGraph<Integer> graph = buildGraphFromStudents();
-        LinkedList<LinkedList<Integer>> comps = graph.connectedComponents();
 
-        comps.traverse(new ListVisitor<LinkedList<Integer>>() {
-            @Override
-            public void visit(LinkedList<Integer> comp) {
-                LinkedList<Student> community = new LinkedList<>();
-                comp.traverse(new ListVisitor<Integer>() {
+    LinkedList<LinkedList<Student>> communities = new LinkedList<>();
+
+    LinkedList<Student> students =
+            studentService.listStudentsOrderedById();
+
+    UnionFind uf = new UnionFind();
+
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student s) {
+            if (s != null) {
+                uf.makeSet(s.getId());
+            }
+        }
+    });
+
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student s1) {
+
+            students.traverse(new ListVisitor<Student>() {
+                @Override
+                public void visit(Student s2) {
+
+                    if (s1 != null
+                            && s2 != null
+                            && s1.getId() < s2.getId()
+                            && s1.sharesPracticeWith(s2)) {
+
+                        uf.union(
+                                s1.getId(),
+                                s2.getId()
+                        );
+                    }
+                }
+            });
+        }
+    });
+
+    LinkedList<Integer> processedRoots = new LinkedList<>();
+
+    students.traverse(new ListVisitor<Student>() {
+        @Override
+        public void visit(Student student) {
+
+            int root = uf.find(student.getId());
+
+            if (!processedRoots.contains(root)) {
+
+                processedRoots.pushBack(root);
+
+                LinkedList<Student> community =
+                        new LinkedList<>();
+
+                students.traverse(new ListVisitor<Student>() {
                     @Override
-                    public void visit(Integer id) {
-                        try {
-                            community.pushBack(studentService.findStudentById(id));
-                        } catch (Exception e) { /* ignore missing */ }
+                    public void visit(Student other) {
+
+                        if (uf.find(other.getId()) == root) {
+                            community.pushBack(other);
+                        }
                     }
                 });
+
                 communities.pushBack(community);
             }
-        });
+        }
+    });
 
-        return communities;
-    }
+    return communities;
+}
 
     /**
      * Retorna la comunidad a la que pertenece un estudiante específico.
@@ -77,7 +124,6 @@ public class CommunityService {
      * @return LinkedList<Student> con todos los estudiantes en la comunidad
      */
     private LinkedList<Student> bfsGetCommunity(Student startStudent, LinkedList<Integer> visited) {
-        // legacy BFS kept for compatibility; prefer graph-based methods above
         LinkedList<Student> community = new LinkedList<>();
         Queue<Student> queue = new ArrayQueue<>();
 
