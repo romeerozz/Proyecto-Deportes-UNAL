@@ -79,6 +79,9 @@ import co.unal.deportesunal.structure.heap.MaxHeap;
 					}
 				}
 			});
+			
+    return bubbleSortDescending(filtered);
+}
 
 			// Ordenar usando montículo (heap) para obtener ranking descendente
 			Comparator<SportCount> comp = new Comparator<SportCount>() {
