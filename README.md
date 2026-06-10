@@ -29,21 +29,45 @@ A partir de esta información, la aplicación permite:
 - Obtener estadísticas generales de deportes.
 - Ejecutar benchmarks sobre diferentes estructuras de índice.
 
-## Nota de alcance Entrega 2
+## Estructuras de datos
 
-Para esta entrega se implementaron manualmente las estructuras obligatorias:
+Todas las estructuras de datos están implementadas manualmente en el paquete `structure/`. No se usa `java.util` para las estructuras base.
 
-- Arreglos dinámicos
-- Listas enlazadas
-- Colas
-- Pilas
-- Árboles BST
-- Árboles AVL
+### Estructuras implementadas
 
-No se usan grafos como estructura base funcional en esta entrega.  
-El paquete `structure/graphadt` queda únicamente como referencia técnica y no entra en la evaluación principal de la Entrega 2.
+| Categoría | Estructura | Ubicación |
+|---|---|---|
+| Arreglos | DinamicArray | `structure/array/` |
+| Listas | LinkedList (con Node, Position, ListVisitor) | `structure/listadt/` |
+| Colas | ArrayQueue | `structure/queue/` |
+| Pilas | ArrayStack | `structure/stackadt/` |
+| Árbol BST | BstTree (BstIndex) | `structure/tree/`, `structure/index/` |
+| Árbol AVL | AvlTree (AvlIndex) | `structure/tree/`, `structure/index/` |
+| Hash | HashTable (HashStudentIndex) | `structure/hash/`, `structure/index/` |
+| Grafos | AdjacencyListGraph, AdjacenceMatrixGraph | `structure/graphadt/` |
+| Heap | MaxHeap, MaxHeapSportCount | `structure/heap/` |
+| Union-Find | UnionFind (con HashTable interna) | `structure/disjointset/` |
 
-Las comunidades deportivas se modelan mediante un grafo implícito: cada estudiante funciona como nodo y dos estudiantes están conectados si comparten al menos un deporte practicado. El recorrido de comunidades se realiza mediante BFS usando una cola implementada manualmente.
+### Índices de estudiantes
+
+Todos los índices implementan la interfaz `StudentIndex` y son intercambiables:
+
+- **ListIndex** — basado en `LinkedList`
+- **BstIndex** — basado en `BstTree` (BST)
+- **AvlIndex** — basado en `AvlTree` (AVL con rebalanceo)
+- **HashStudentIndex** — basado en `HashTable`
+
+### Grafos
+
+Los grafos se usan exclusivamente para benchmarks. El grafo se construye con conexión en cadena (`O(k)`): los estudiantes se agrupan por deporte y cada grupo se conecta secuencialmente como una lista enlazada, evitando la conexión completa `O(k²)`. `GraphBenchmarkRunner` usa únicamente `LinkedList` y `HashTable` (sin `ArrayList` ni `EnumMap`).
+
+### Union-Find
+
+`UnionFind` usa `HashTable` (implementación propia) para `parent` y `rank`, en lugar de `java.util.HashMap`.
+
+### Comunidades deportivas
+
+Las comunidades se modelan mediante BFS sobre un grafo implícito: cada estudiante funciona como nodo y dos están conectados si comparten al menos un deporte practicado. El recorrido usa `ArrayQueue`.
 
 ## Lenguaje y entorno
 
@@ -68,6 +92,10 @@ Proyecto-Deportes-UNAL/
 │   ├── mock/
 │   │   └── ...
 │   ├── results/
+│   │   ├── benchmark_full.csv
+│   │   ├── index_benchmark_full.csv
+│   │   ├── index_benchmark_quick.csv
+│   │   ├── graph_benchmark_full.csv
 │   │   └── ...
 │   └── graphics/
 │       └── ...
@@ -80,6 +108,7 @@ Proyecto-Deportes-UNAL/
 │               │   ├── factories/
 │               │   │   ├── AvlIndexFactory.java
 │               │   │   ├── BstIndexFactory.java
+│               │   │   ├── HashIndexFactory.java
 │               │   │   ├── IndexFactory.java
 │               │   │   └── ListIndexFactory.java
 │               │   ├── scripts/
@@ -92,6 +121,7 @@ Proyecto-Deportes-UNAL/
 │               │   ├── BenchmarkConfig.java
 │               │   ├── BenchmarkOperation.java
 │               │   ├── BenchmarkRunner.java
+│               │   ├── GraphBenchmarkRunner.java
 │               │   └── IndexBenchmark.java
 │               ├── controller/
 │               │   └── AppController.java
@@ -115,12 +145,22 @@ Proyecto-Deportes-UNAL/
 │               ├── structure/
 │               │   ├── array/
 │               │   │   └── DinamicArray.java
+│               │   ├── disjointset/
+│               │   │   └── UnionFind.java
 │               │   ├── graphadt/
 │               │   │   ├── AdjacenceMatrixGraph.java
+│               │   │   ├── AdjacencyListGraph.java
 │               │   │   └── Graph.java
+│               │   ├── hash/
+│               │   │   └── HashTable.java
+│               │   ├── heap/
+│               │   │   ├── Comparator.java
+│               │   │   ├── MaxHeap.java
+│               │   │   └── MaxHeapSportCount.java
 │               │   ├── index/
 │               │   │   ├── AvlIndex.java
 │               │   │   ├── BstIndex.java
+│               │   │   ├── HashStudentIndex.java
 │               │   │   ├── ListIndex.java
 │               │   │   └── StudentIndex.java
 │               │   ├── listadt/
@@ -142,7 +182,15 @@ Proyecto-Deportes-UNAL/
 │               │       ├── BstTree.java
 │               │       └── Tree.java
 │               ├── test/
+│               │   ├── AdjacencyListGraphTest.java
+│               │   ├── HashStudentIndexTest.java
+│               │   ├── HashTableTest.java
+│               │   ├── MaxHeapTest.java
+│               │   ├── SmokeTestsRunner.java
 │               │   └── StudentServiceSmokeTest.java
+│               ├── tools/
+│               │   ├── QuickGraphBenchmark.java
+│               │   └── QuickGraphBenchmarkSmall.java
 │               ├── ui/
 │               │   ├── ConsoleUi.java
 │               │   └── MainWindow.java
@@ -243,79 +291,77 @@ Formato esperado para el archivo de texto:
 El sistema carga automáticamente este archivo al iniciar. También se puede recargar o guardar manualmente desde el menú principal.
 
 ### Benchmarks
-El proyecto incluye una suite de benchmarks para comparar diferentes implementaciones de StudentIndex.
+El proyecto incluye una suite de benchmarks para comparar diferentes implementaciones de índices y estructuras.
 
-Implementaciones evaluadas: 
-- ListStudentIndex
-- BstIndex
-- AvlIndex
+Estructuras evaluadas:
+- **LIST** — ListIndex (basado en LinkedList)
+- **BST** — BstIndex (basado en BstTree)
+- **AVL** — AvlIndex (basado en AvlTree)
+- **HASH** — HashStudentIndex (basado en HashTable)
+- **GRAPH** — AdjacencyListGraph (benchmark de grafos con conexión en cadena)
+- **UF** — UnionFind (basado en HashTable)
 
-Operaciones evaluadas: 
-- PUT: inserción de estudiantes. 
-- FIND: búsqueda de estudiantes por ID.
-- DELETE: eliminación de estudiantes por ID. 
+Operaciones evaluadas:
+- **PUT**: inserción de datos
+- **GET**: búsqueda/consulta de datos por ID
+- **REMOVE**: eliminación de datos por ID
 
-Los benchmarks usan datos mock generados aleatoriamente y no modifican el archivo principal students.txt.
+Todas las estructuras se evalúan en una misma ejecución y los resultados se consolidan en un único archivo CSV.
 
-### Menú de benchmarks
+### Configuración rápida
 
-Desde la aplicación: 
-```Bash 
-# id;name;PRACTICE(comma);INTEREST(comma)
---- Benchmarks ---
-1) Ejecutar TODOS los benchmarks (configuración completa)
-2) Ejecutar TODOS los benchmarks (configuración rápida)
-3) Ejecutar solo PUT
-4) Ejecutar solo GET
-5) Ejecutar solo REMOVE
-6) Ejecutar por estructura específica
-0) Volver
+```text
+10, 100, 1000, 10000
 ```
 
-### Configuración rápida: 
-```Bash 
-10^3
-10^4
-```
-Esta configuración es útil para comparar rápidamente LIST, BST y AVL.
+Ideal para verificar comportamiento y comparar rápidamente todas las estructuras.
 
-### Configuración completa 
-La configuración completa se usa para resultados más representativos.
+### Configuración completa
 
-Suele incluir:
-```Bash 
-10^4
-10^5
-10^6
+```text
+100000, 1000000, 10000000, 100000000
 ```
-En la práctica, se recomienda correr la comparación completa principalmente entre BST y AVL, ya que ListStudentIndex puede volverse demasiado lento para tamaños grandes.
+
+Usada para resultados representativos. Se recomienda aumentar la memoria JVM para tamaños grandes.
+
+### Protocolo de medición
+
+1. **Warmup**: 1 iteración de calentamiento JVM con 10 000 elementos (datos descartados).
+2. **Trials**: 3 repeticiones por cada tamaño con semillas diferentes por trial (`seed`, `seed+1`, `seed+2`).
+3. **Semillas**: cada trial usa semillas distintas para generación de datos, IDs de consulta y IDs de eliminación.
 
 ### Archivos de resultados
-Los resultados se guardan en: 
-```Bash 
+Los resultados se guardan en:
+
+```text
 data/results/
 ```
 
-Ejemplo de los archivos: 
-```Bash 
-data/results/index_benchmark_quick.csv
-data/results/index_benchmark_full.csv
-data/results/index_benchmark_put.csv
-data/results/index_benchmark_get.csv
-data/results/index_benchmark_remove.csv
-data/results/index_benchmark_avl_vs_bst_fullbenchmark.csv
+Archivo unificado (contiene LIST, BST, AVL, HASH, GRAPH, UF):
+
+```text
+data/results/benchmark_full.csv
 ```
 
-Cada fila del CSV tiene el formato: 
-```Bash 
+Archivos adicionales para ejecuciones específicas:
+
+```text
+data/results/index_benchmark_quick.csv
+data/results/index_benchmark_full.csv
+data/results/graph_benchmark_full.csv
+```
+
+Cada fila del CSV tiene el formato:
+
+```text
 structure,operation,n,trial,seed,count,time_ns
 ```
 
-Donde: 
-- **structure:** estructura evaluada (LIST, AVL, BST)
+Donde:
+- **structure:** estructura evaluada (LIST, BST, AVL, HASH, GRAPH, UF)
 - **operation:** operación medida (PUT, GET, REMOVE)
 - **n:** tamaño de entrada
-- **trial:** número de  repetición
+- **trial:** número de repetición
 - **seed:** semilla usada
 - **count:** cantidad de operaciones ejecutadas
 - **time_ns:** tiempo total en nanosegundos
@@ -329,12 +375,12 @@ cd Proyecto-Deportes-UNAL
 
 Luego ejecutar: 
 ```Bash 
-python3 src/co/unal/deportesunal/benchmark/scripts/plot_benchmarks.py data/results/index_benchmark_quick.csv
+python3 src/co/unal/deportesunal/benchmark/scripts/plot_benchmarks.py data/results/benchmark_full.csv
 ```
 
-O para el benchmark completo AVL vs BST:
+O para un archivo específico:
 ```Bash 
-python3 src/co/unal/deportesunal/benchmark/scripts/plot_benchmarks.py data/results/index_benchmark_avl_vs_bst_fullbenchmark.csv
+python3 src/co/unal/deportesunal/benchmark/scripts/plot_benchmarks.py data/results/index_benchmark_quick.csv
 ```
 
 ### Carpeta de salida de gráficas
@@ -378,68 +424,35 @@ Para probar la aplicación normalmente:
 ```Bash 
 java -cp out co.unal.deportesunal.AppMain
 ```
+
+Para iniciar en modo consola (sin GUI):
+```Bash
+java -cp out co.unal.deportesunal.AppMain cli
+```
+
 Para benchmarks grandes, se recomienda ejecutar desde terminal y aumentar la memoria de la JVM:
 ```Bash 
 java -Xms2g -Xmx4g -cp out co.unal.deportesunal.AppMain
 ```
 
-Si la prueba incluye ListStudentIndex con tamaños grandes, puede tardar mucho. Por eso se recomienda:
+Si la prueba incluye LIST con tamaños grandes, puede tardar mucho. Por eso se recomienda:
 - Usar LIST solo en benchmark rápido.
-- Usar BST y AVL para benchmark completo.
+- Usar BST, AVL, HASH para benchmark completo.
 - Ejecutar operaciones específicas si la suite tarda demasiado. 
-
-## Estructuras implementadas
-
-### Listas
-Usadas para: 
-- Almacenar deportes, prácticas e interés. 
-- Retornar colecciones de estudiantes.
-- representar comunidade.
-- Implementar ListIndex.
-
-### DynamicArray
-Usado como base para: 
-- ArrayStack
-- ArrayQueue
-
-### Stack
-
-Usado como apoyo en recorridos iterativos de árboles.
-
-### Queue 
-
-Usada en BFS para construir comunidades deportivas.
-
-### BST 
-
-Usdado como implementación de índice mediante BstIndex
-
-### AVL
-
-Usado como inmplementación de índice mediante AvlIndex. 
-
-El sistema usa la interfaz StudentIndez, lo que permite cambiar entre distintas implementaciones sin modificar StudentService.
-
-## Consideraciones importantes
-
-- No se usaron librerías externas o de Java para las estructutas de datos. 
-- Las estructuras de datos fueron implementadas manualmente. 
-- El archivo students.txt corresponde al CRUD interactivo. 
-- Los benchmark usan datos mock separados.
-- La implementación de grafos queda fuera del alcance principal de esta entrega.
 
 ## Estado actual
 
 El proyecto cuenta con: 
-- CRUD funcional por consola.
-- Persistencia en archivos de ttexto.
-- Índices intercambiables mediante StudentIndex.
-- Implementaciones con listas, BST, AVL. 
+- CRUD funcional por consola e interfaz gráfica (Swing con Nimbus L&F).
+- Persistencia en archivos de texto.
+- Índices intercambiables mediante StudentIndex (LIST, BST, AVL, HASH).
+- Grafos con conexión en cadena para benchmarks.
+- Union-Find con HashTable interna para benchmarks.
 - Comunidades deportivas mediante BFS.
 - Estadísticas de deportes.
-- Benchmarks configurables.
-- Exportación de resultados a CSV.
-- Generación de grpaficas con Python. 
+- Benchmarks configurables con warmup, trials y semillas diferenciadas.
+- Exportación de resultados a CSV unificado.
+- Generación de gráficas con Python. 
 
 
 

@@ -1,65 +1,63 @@
-# Entrega 2 - Division de Trabajo
+# Proyecto-Deportes-UNAL — Código fuente
 
-## Alcance Academico (Oficial)
+## Estructuras implementadas (todas manuales, sin java.util)
 
-Estructuras obligatorias para esta entrega:
-- Arreglos
-- Listas
-- Colas
-- Pilas
-- Arboles (BST, AVL)
+### `structure/`
 
-Restriccion:
-- No se usan grafos como base funcional en Entrega 2.
-- No se permite usar librerias con estructuras ya implementadas.
-- Las estructuras deben implementarse manualmente.
+| Paquete | Clases |
+|---|---|
+| `array/` | `DinamicArray` |
+| `disjointset/` | `UnionFind` (usa `HashTable` propia) |
+| `graphadt/` | `Graph`, `AdjacencyListGraph`, `AdjacenceMatrixGraph` |
+| `hash/` | `HashTable` |
+| `heap/` | `MaxHeap`, `MaxHeapSportCount`, `Comparator` |
+| `index/` | `StudentIndex` (interfaz), `ListIndex`, `BstIndex`, `AvlIndex`, `HashStudentIndex` |
+| `listadt/` | `ListAdt`, `LinkedList`, `Node`, `Position`, `ListVisitor` |
+| `queue/` | `Queue`, `ArrayQueue` |
+| `stackadt/` | `Stack`, `ArrayStack` |
+| `tree/` | `Tree`, `BstTree`, `AvlTree` |
+| `tests/` | `StructureSanityTests` |
 
-## Persona 1 - EDD base
+### `benchmark/`
 
-Implementa:
-- structure.array.DinamicArray
-- structure.listadt.LinkedList y structure.listadt.Node
-- structure.stackadt.Stack y structure.stackadt.ArrayStack
-- structure.queue.Queue y structure.queue.ArrayQueue
+- `BenchmarkConfig` — configuraciones: `defaultConfig()` (100K, 1M, 10M, 100M) y `quickConfig()` (10, 100, 1K, 10K)
+- `BenchmarkRunner` — orquesta índices + grafos + UF en un solo CSV
+- `GraphBenchmarkRunner` — benchmarks de grafos con `LinkedList` y `HashTable`
+- `IndexBenchmark` — PUT/GET/REMOVE sobre `StudentIndex`
+- `factories/` — `IndexFactory`, `ListIndexFactory`, `BstIndexFactory`, `AvlIndexFactory`, `HashIndexFactory`
+- `scripts/plot_benchmarks.py` — genera gráficas desde CSV
+- `utils/` — `Timer`, `MockDataGenerator`, `CsvWriter`, `SimpleCsvWriter`
 
-## Persona 2 - Arboles (BST/AVL)
+### `ui/`
 
-Implementa:
-- structure.tree.StudentIndex
-- structure.tree.AvlIndex (obligatorio)
-- structure.tree.BstIndex (recomendado)
+- `ConsoleUi` — interfaz por terminal
+- `MainWindow` — interfaz gráfica Swing con Nimbus Look and Feel
 
-Checklist obligatorio:
-1. Contratos de error en StudentIndex:
-- get(id) lanza NotFoundException si no existe.
-- put(id, student) lanza DuplicatedIdException si el ID ya existe.
-2. AvlIndex completo:
-- put/get/remove con rebalanceo LL/RR/LR/RL.
-- valuesInOrder() ordenado por ID.
-- size() consistente.
-3. BstIndex recomendado:
-- mismo contrato de StudentIndex.
-4. Pruebas minimas:
-- rotaciones LL/RR/LR/RL en AVL.
-- remove de hoja, 1 hijo y 2 hijos.
-- verificacion in-order.
+### `test/`
 
-## Kevin - Dominio + Servicios + Controlador + Persistencia + Benchmark
+- `StudentServiceSmokeTest`
+- `SmokeTestsRunner`
+- `HashTableTest`
+- `HashStudentIndexTest`
+- `AdjacencyListGraphTest`
+- `MaxHeapTest`
 
-Implementa:
-- domain/* (Student, SportsEnum, SportsCount, excepciones)
-- persistence/* (StudentRepository, TxtStudentRepository)
-- service/* (StudentService, CommunityService, ConnectionService, StatsService)
-- controller/AppController
-- ui/ConsoleUi
-- benchmark/* (MockDataGenerator, BenchmarkRunner, Timer)
-- AppMain (inyeccion de dependencias y ejecucion)
+### `tools/`
 
-## Checklist de Integracion
+- `QuickGraphBenchmark` — ejecución rápida de benchmarks de grafos
+- `QuickGraphBenchmarkSmall` — versión con tamaños pequeños
 
-1. Compila y ejecuta AppMain desde repositorio clonado.
-2. CRUD completo de estudiantes.
-3. Consultas de comunidad sin grafo (segun reglas del enunciado).
-4. Verificacion de conexiones sin usar estructura de grafo.
-5. Estadisticas y ranking por deporte.
-6. Benchmark con salida CSV/TXT en docs/results/.
+## Protocolo de benchmarks
+
+- **Warmup**: 1 iteración de calentamiento (10 000 elementos, datos descartados)
+- **Trials**: 3 repeticiones, cada una con semilla diferente (`seed`, `seed+1`, `seed+2`)
+- **Semillas**: cada trial usa semillas independientes para generar datos, IDs de consulta y IDs de eliminación
+- **CSV unificado**: todas las estructuras (LIST, BST, AVL, HASH, GRAPH, UF) se escriben en el mismo archivo
+
+## Compilación
+
+```bash
+javac -d out $(find src -name "*.java")
+java -cp out co.unal.deportesunal.AppMain
+java -cp out co.unal.deportesunal.AppMain cli    # modo consola
+```

@@ -1,10 +1,22 @@
 package co.unal.deportesunal.structure.listadt;
 
+/**
+ * Implementación de una lista doblemente enlazada genérica. Ofrece
+ * operaciones de inserción, eliminación y consulta por ambos extremos,
+ * así como recorrido mediante un visitante.
+ *
+ * @param <T> tipo de los elementos almacenados
+ */
 public class LinkedList<T> implements listAdt<T> {
     private Node<T> head;
     private Node<T> tail;
     private int size;
 
+    /**
+     * Inserta un elemento al inicio de la lista.
+     *
+     * @param value valor a insertar
+     */
     @Override
     public void pushFront(T value) {
         Node<T> newNode = new Node<>(value);
@@ -22,6 +34,11 @@ public class LinkedList<T> implements listAdt<T> {
         size++;
     }
 
+    /**
+     * Inserta un elemento al final de la lista.
+     *
+     * @param value valor a insertar
+     */
     @Override
     public void pushBack(T value) {
         Node<T> newNode = new Node<>(value);
@@ -39,6 +56,12 @@ public class LinkedList<T> implements listAdt<T> {
         size++;
     }
 
+    /**
+     * Elimina y retorna el primer elemento de la lista.
+     *
+     * @return el valor del primer elemento
+     * @throws IllegalStateException si la lista está vacía
+     */
     @Override
     public T popFront() {
         if (isEmpty()) {
@@ -60,6 +83,12 @@ public class LinkedList<T> implements listAdt<T> {
         return deleted;
     }
 
+    /**
+     * Elimina y retorna el último elemento de la lista.
+     *
+     * @return el valor del último elemento
+     * @throws IllegalStateException si la lista está vacía
+     */
     @Override
     public T popBack() {
         if (isEmpty()) {
@@ -81,11 +110,22 @@ public class LinkedList<T> implements listAdt<T> {
         return deleted;
     }
 
+    /**
+     * Verifica si la lista está vacía.
+     *
+     * @return {@code true} si la lista no contiene elementos
+     */
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
+    /**
+     * Retorna el valor del primer elemento sin eliminarlo.
+     *
+     * @return valor del primer elemento
+     * @throws IllegalStateException si la lista está vacía
+     */
     @Override
     public T topFront() {
         if (isEmpty()) {
@@ -95,6 +135,12 @@ public class LinkedList<T> implements listAdt<T> {
         return head.getValue();
     }
 
+    /**
+     * Retorna el valor del último elemento sin eliminarlo.
+     *
+     * @return valor del último elemento
+     * @throws IllegalStateException si la lista está vacía
+     */
     @Override
     public T topBack() {
         if (isEmpty()) {
@@ -104,11 +150,22 @@ public class LinkedList<T> implements listAdt<T> {
         return tail.getValue();
     }
 
+    /**
+     * Retorna la cantidad de elementos en la lista.
+     *
+     * @return número de elementos
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * Busca la primera ocurrencia de un valor en la lista.
+     *
+     * @param value valor a buscar
+     * @return la posición del valor, o {@code null} si no se encuentra
+     */
     @Override
     public Position<T> find(T value) {
         Node<T> aux = head;
@@ -122,6 +179,12 @@ public class LinkedList<T> implements listAdt<T> {
         return null;
     }
 
+    /**
+     * Elimina el elemento en la posición especificada.
+     *
+     * @param position posición del elemento a eliminar
+     * @throws IllegalArgumentException si la posición es {@code null}
+     */
     @Override
     public void erase(Position<T> position) {
         if (position == null) {
@@ -160,6 +223,12 @@ public class LinkedList<T> implements listAdt<T> {
         size--;
     }
 
+    /**
+     * Elimina la primera ocurrencia del valor especificado.
+     *
+     * @param value valor a eliminar
+     * @return {@code true} si se eliminó, {@code false} si no se encontró
+     */
     @Override
     public boolean remove(T value) {
         Position<T> position = find(value);
@@ -171,6 +240,13 @@ public class LinkedList<T> implements listAdt<T> {
         return true;
     }
 
+    /**
+     * Inserta un nuevo valor antes de la posición especificada.
+     *
+     * @param position posición de referencia
+     * @param value    valor a insertar
+     * @throws IllegalArgumentException si la posición es {@code null}
+     */
     @Override
     public void addBefore(Position<T> position, T value) {
         if (position == null) {
@@ -195,6 +271,13 @@ public class LinkedList<T> implements listAdt<T> {
         size++;
     }
 
+    /**
+     * Inserta un nuevo valor después de la posición especificada.
+     *
+     * @param position posición de referencia
+     * @param value    valor a insertar
+     * @throws IllegalArgumentException si la posición es {@code null}
+     */
     @Override
     public void addAfter(Position<T> position, T value) {
         if (position == null) {
@@ -219,11 +302,23 @@ public class LinkedList<T> implements listAdt<T> {
         size++;
     }
 
+    /**
+     * Verifica si la lista contiene el valor especificado.
+     *
+     * @param value valor a buscar
+     * @return {@code true} si el valor está presente
+     */
     @Override
     public boolean contains(T value) {
         return find(value) != null;
     }
 
+    /**
+     * Recorre la lista aplicando el visitante a cada elemento en orden.
+     *
+     * @param visitor visitante a aplicar
+     * @throws IllegalArgumentException si el visitante es {@code null}
+     */
     @Override
     public void traverse(ListVisitor<T> visitor) {
         if (visitor == null) {

@@ -27,19 +27,13 @@ public class FileConstant {
             RESULTS_DIR + File.separator + "index_benchmark.csv";
 
     public static final String INDEX_BENCHMARK_FULL =
-            RESULTS_DIR + File.separator + "index_benchmark_full.csv";
+            RESULTS_DIR + File.separator + "benchmark_full.csv";
 
     public static String indexBenchmarkResult(String label) {
-        return RESULTS_DIR + File.separator + "index_benchmark_" + label + ".csv";
+        return RESULTS_DIR + File.separator + "benchmark_" + label + ".csv";
     }
 
-        public static final String GRAPH_BENCHMARK_RESULTS =
-                        RESULTS_DIR + File.separator + "graph_benchmark.csv";
-
-        public static final String GRAPH_BENCHMARK_FULL =
-                        RESULTS_DIR + File.separator + "graph_benchmark_full.csv";
-
-        public static String graphBenchmarkResult(String label) {
-                return RESULTS_DIR + File.separator + "graph_benchmark_" + label + ".csv";
-        }
+    public static String graphBenchmarkResult(String label) {
+        return indexBenchmarkResult("graph_" + label);
+    }
 }

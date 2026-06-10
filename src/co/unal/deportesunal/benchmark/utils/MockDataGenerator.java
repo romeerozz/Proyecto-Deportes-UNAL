@@ -6,11 +6,24 @@ import co.unal.deportesunal.structure.listadt.LinkedList;
 
 import java.util.Random;
 
+/**
+ * Generador de datos mock para las pruebas de rendimiento.
+ * Crea listas de estudiantes con IDs únicos, nombres generados y deportes
+ * aleatorios (práctica e interés), así como arreglos de IDs para consultas y eliminaciones.
+ */
 public class MockDataGenerator {
 
     private static final int MIN_SPORTS_PER_LIST = 1;
     private static final int MAX_SPORTS_PER_LIST = 3;
 
+    /**
+     * Genera una lista de estudiantes con IDs barajados y deportes aleatorios.
+     *
+     * @param n    cantidad de estudiantes a generar
+     * @param seed semilla para la generación aleatoria
+     * @return lista enlazada de estudiantes
+     * @throws IllegalArgumentException si n es negativo
+     */
     public LinkedList<Student> generateStudents(int n, long seed) {
         if (n < 0) {
             throw new IllegalArgumentException("n must be greater than or equal to 0.");
@@ -86,6 +99,12 @@ public class MockDataGenerator {
         return result;
     }
 
+    /**
+     * Genera un arreglo de IDs secuenciales de 1 a n.
+     *
+     * @param n cantidad de IDs
+     * @return arreglo de IDs secuenciales
+     */
     private int[] generateSequentialIds(int n) {
         int[] ids = new int[n];
 
@@ -96,6 +115,14 @@ public class MockDataGenerator {
         return ids;
     }
 
+    /**
+     * Agrega una cantidad determinada de deportes aleatorios a un estudiante.
+     *
+     * @param student  estudiante al que agregar deportes
+     * @param count    cantidad de deportes a agregar
+     * @param practice true para deportes de práctica, false para interés
+     * @param random   generador de números aleatorios
+     */
     private void addRandomSports(Student student, int count, boolean practice, Random random) {
         SportEnum[] sports = SportEnum.values();
         int added = 0;
@@ -116,14 +143,33 @@ public class MockDataGenerator {
         }
     }
 
+    /**
+     * Genera una cantidad aleatoria de deportes dentro del rango configurado.
+     *
+     * @param random generador de números aleatorios
+     * @return cantidad aleatoria entre MIN_SPORTS_PER_LIST y MAX_SPORTS_PER_LIST
+     */
     private int randomSportCount(Random random) {
         return MIN_SPORTS_PER_LIST + random.nextInt(MAX_SPORTS_PER_LIST);
     }
 
+    /**
+     * Construye un nombre de estudiante con formato "Student_XXXXXX".
+     *
+     * @param id identificador del estudiante
+     * @return nombre formateado
+     */
     private String buildName(int id) {
         return "Student_" + padLeft(id, 6);
     }
 
+    /**
+     * Rellena un número con ceros a la izquierda hasta alcanzar el ancho dado.
+     *
+     * @param value valor numérico
+     * @param width ancho total deseado
+     * @return cadena con ceros a la izquierda
+     */
     private String padLeft(int value, int width) {
         String text = String.valueOf(value);
         StringBuilder sb = new StringBuilder();
@@ -136,6 +182,12 @@ public class MockDataGenerator {
         return sb.toString();
     }
 
+    /**
+     * Baraja un arreglo de enteros usando el algoritmo de Fisher-Yates.
+     *
+     * @param array  arreglo a barajar
+     * @param random generador de números aleatorios
+     */
     private void shuffle(int[] array, Random random) {
         for (int i = array.length - 1; i > 0; i--) {
             int j = random.nextInt(i + 1);

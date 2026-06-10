@@ -2,7 +2,6 @@ package co.unal.deportesunal.ui;
 
 import co.unal.deportesunal.benchmark.BenchmarkConfig;
 import co.unal.deportesunal.benchmark.BenchmarkOperation;
-import co.unal.deportesunal.benchmark.GraphBenchmarkRunner;
 import co.unal.deportesunal.benchmark.BenchmarkRunner;
 import co.unal.deportesunal.benchmark.factories.AvlIndexFactory;
 import co.unal.deportesunal.benchmark.factories.BstIndexFactory;
@@ -23,17 +22,11 @@ public class ConsoleUi {
 
     private final AppController controller;
     private final BenchmarkRunner benchmarkRunner;
-    private final GraphBenchmarkRunner graphBenchmarkRunner;
     private final Scanner sc = new Scanner(System.in);
 
     public ConsoleUi(AppController controller, BenchmarkRunner benchmarkRunner) {
-        this(controller, benchmarkRunner, new GraphBenchmarkRunner());
-    }
-
-    public ConsoleUi(AppController controller, BenchmarkRunner benchmarkRunner, GraphBenchmarkRunner graphBenchmarkRunner) {
         this.controller = controller;
         this.benchmarkRunner = benchmarkRunner;
-        this.graphBenchmarkRunner = graphBenchmarkRunner;
     }
 
     private void autoLoadOnStart() {
@@ -562,17 +555,15 @@ public class ConsoleUi {
                             false
                     );
 
-                        case 5 -> runBenchmark(
+case 5 -> runBenchmark(
                             BenchmarkConfig.defaultConfig(),
                             allFactories(),
                             new BenchmarkOperation[]{BenchmarkOperation.REMOVE},
                             FileConstant.indexBenchmarkResult("remove"),
                             false
-                        );
+                    );
 
-                        case 6 -> runGraphBenchmarkFlow();
-
-                        case 7 -> runBenchmarkByStructure();
+                        case 6 -> runBenchmarkByStructure();
 
                     case 0 -> back = true;
 
@@ -591,8 +582,7 @@ public class ConsoleUi {
         System.out.println("3) Ejecutar solo PUT");
         System.out.println("4) Ejecutar solo GET");
         System.out.println("5) Ejecutar solo REMOVE");
-        System.out.println("6) Ejecutar benchmarks de grafo");
-        System.out.println("7) Ejecutar por estructura específica");
+        System.out.println("6) Ejecutar por estructura específica");
         System.out.println("0) Volver");
     }
 
@@ -618,16 +608,10 @@ public class ConsoleUi {
         System.out.println("2) BST");
         System.out.println("3) AVL");
         System.out.println("4) HASH");
-        System.out.println("5) GRAFO");
-        System.out.println("6) BST + AVL");
+        System.out.println("5) BST + AVL");
         System.out.println("0) Cancelar");
 
         int structureOption = readInt("Opción: ");
-
-        if (structureOption == 5) {
-            runGraphBenchmarkFlow();
-            return;
-        }
 
         IndexFactory[] factories;
 
@@ -636,7 +620,7 @@ public class ConsoleUi {
             case 2 -> factories = new IndexFactory[]{new BstIndexFactory()};
             case 3 -> factories = new IndexFactory[]{new AvlIndexFactory()};
             case 4 -> factories = new IndexFactory[]{new HashIndexFactory()};
-            case 6 -> factories = new IndexFactory[]{new BstIndexFactory(), new AvlIndexFactory()};
+            case 5 -> factories = new IndexFactory[]{new BstIndexFactory(), new AvlIndexFactory()};
             case 0 -> {
                 System.out.println("Benchmark cancelado.");
                 return;
@@ -668,37 +652,6 @@ public class ConsoleUi {
         String outputPath = FileConstant.indexBenchmarkResult(label);
 
         runBenchmark(config, factories, operations, outputPath, append);
-    }
-
-    private void runGraphBenchmarkFlow() throws Exception {
-        System.out.println("\n--- Benchmark de grafo ---");
-
-        BenchmarkOperation[] operations = chooseOperations();
-        if (operations == null) {
-            System.out.println("Benchmark cancelado.");
-            return;
-        }
-
-        BenchmarkConfig config = chooseBenchmarkConfig();
-        boolean append = askAppendResults();
-
-        String label = readLine("Nombre para el archivo CSV (ej: graph_put, graph_get): ")
-                .trim()
-                .toLowerCase();
-
-        if (label.isEmpty()) {
-            label = "custom";
-        }
-
-        String outputPath = FileConstant.graphBenchmarkResult(label);
-
-        System.out.println("\nEjecutando benchmark de grafo...");
-        System.out.println("Resultados: " + outputPath);
-
-        graphBenchmarkRunner.runOperations(config, operations, outputPath, append);
-
-        System.out.println("Benchmark de grafo terminado.");
-        System.out.println("CSV generado en: " + outputPath);
     }
 
     private BenchmarkOperation[] chooseOperations() {

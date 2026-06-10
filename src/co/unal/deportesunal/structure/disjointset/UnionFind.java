@@ -1,17 +1,31 @@
 package co.unal.deportesunal.structure.disjointset;
 
-import java.util.HashMap;
+import co.unal.deportesunal.structure.hash.HashTable;
 
+/**
+ * Estructura de datos Union-Find (conjuntos disjuntos) con compresión de ruta
+ * y unión por rango. Permite agrupar elementos en conjuntos disjuntos y
+ * consultar si dos elementos pertenecen al mismo conjunto.
+ */
 public class UnionFind {
 
-    private final HashMap<Integer, Integer> parent;
-    private final HashMap<Integer, Integer> rank;
+    private final HashTable<Integer, Integer> parent;
+    private final HashTable<Integer, Integer> rank;
 
+    /**
+     * Crea una nueva instancia de Union-Find vacía.
+     */
     public UnionFind() {
-        parent = new HashMap<>();
-        rank = new HashMap<>();
+        parent = new HashTable<>();
+        rank = new HashTable<>();
     }
 
+    /**
+     * Crea un nuevo conjunto que contiene únicamente el elemento {@code x}.
+     * Si el elemento ya existe, no hace nada.
+     *
+     * @param x elemento a agregar como nuevo conjunto
+     */
     public void makeSet(int x) {
         if (!parent.containsKey(x)) {
             parent.put(x, x);
@@ -19,6 +33,13 @@ public class UnionFind {
         }
     }
 
+    /**
+     * Encuentra el representante (raíz) del conjunto al que pertenece
+     * {@code x}. Aplica compresión de ruta para aplanar el árbol.
+     *
+     * @param x elemento a consultar
+     * @return raíz del conjunto de {@code x}
+     */
     public int find(int x) {
         int p = parent.get(x);
 
@@ -29,6 +50,13 @@ public class UnionFind {
         return parent.get(x);
     }
 
+    /**
+     * Une los conjuntos que contienen a {@code a} y {@code b}. Si ya
+     * pertenecen al mismo conjunto, no hace nada.
+     *
+     * @param a primer elemento
+     * @param b segundo elemento
+     */
     public void union(int a, int b) {
 
         int rootA = find(a);

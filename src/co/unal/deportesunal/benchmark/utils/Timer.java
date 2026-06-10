@@ -1,5 +1,9 @@
 package co.unal.deportesunal.benchmark.utils;
 
+/**
+ * Cronómetro simple para medir tiempos de ejecución usando System.nanoTime().
+ * Proporciona una única operación: medir el tiempo de un bloque Runnable.
+ */
 public class Timer {
 
     /**

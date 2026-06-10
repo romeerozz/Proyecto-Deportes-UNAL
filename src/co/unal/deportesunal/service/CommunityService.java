@@ -4,6 +4,7 @@ import co.unal.deportesunal.domain.Student;
 import co.unal.deportesunal.structure.listadt.LinkedList;
 import co.unal.deportesunal.structure.listadt.ListVisitor;
 import co.unal.deportesunal.structure.graphadt.AdjacencyListGraph;
+import co.unal.deportesunal.structure.disjointset.UnionFind;
 import co.unal.deportesunal.structure.queue.ArrayQueue;
 import co.unal.deportesunal.structure.queue.Queue;
 
@@ -21,6 +22,12 @@ public class CommunityService {
     }
 
     
+    /**
+     * Encuentra y retorna todas las comunidades de estudiantes.
+     * Dos estudiantes pertenecen a la misma comunidad si comparten
+     * al menos un deporte practicado. Usa Union-Find para agruparlos.
+     * @return LinkedList<LinkedList<Student>> con las comunidades encontradas
+     */
     public LinkedList<LinkedList<Student>> findCommunities() {
 
     LinkedList<LinkedList<Student>> communities = new LinkedList<>();
